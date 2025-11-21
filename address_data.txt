@@ -1,0 +1,301 @@
+ID,UserID,Street,City,ZipCode
+1,1,Fatih Mah. ,Trabzon,27491
+2,2,Yıldız Mah.,Erzincan,41688
+3,3,Mimar Sinan Mah. ,Balıkesir,10868
+4,4,Karanfil Mah.,Sakarya,80498
+5,5,Cumhuriyet Mah. ,Eskişehir,18187
+6,6,Esentepe Mah. ,Van,53095
+7,7,Esentepe Mah.,Çankırı,48950
+8,8,Gül Mah. ,Ordu,72706
+9,9,Karanfil Mah.,Zonguldak,31026
+10,10,Merkez Mah.,Tunceli,32064
+11,11,Barış Mah. ,Çanakkale,55269
+12,12,Aydınlıkevler Mah. ,Kayseri,43571
+13,13,Aydınlıkevler Mah. ,Kars,19748
+14,14,Aydınlıkevler Mah.,Kütahya,12980
+15,15,Gül Mah. ,Tunceli,79423
+16,16,Gazi Mah.,Niğde,41845
+17,17,Barış Mah.,Sinop,30483
+18,18,Karşıyaka Mah. ,Ardahan,39942
+19,19,Karanfil Mah. ,Kocaeli,71601
+20,20,Bahçelievler Mah.,Ankara,32348
+21,21,Gül Mah. ,Batman,74323
+22,22,Mimar Sinan Mah. ,Çanakkale,51611
+23,23,Bahçelievler Mah. ,Eskişehir,52429
+24,24,Lale Mah.,Kütahya,31578
+25,25,Çınar Mah. ,Kocaeli,81529
+26,26,Bahçelievler Mah. ,Elazığ,30702
+27,27,Merkez Mah. ,Afyonkarahisar,74251
+28,28,Karanfil Mah.,Tokat,30378
+29,29,Aydınlıkevler Mah. ,Kocaeli,28273
+30,30,Yavuz Selim Mah. ,Batman,40630
+31,31,Lale Mah.,Burdur,80862
+32,32,Barış Mah. ,Batman,13866
+33,33,Atatürk Mah. ,Adana,65503
+34,34,Lale Mah. ,Antalya,58179
+35,35,Menekşe Mah.,Trabzon,10688
+36,36,Papatya Mah.,Sakarya,68807
+37,37,Barış Mah.,Sivas,23206
+38,38,Yeni Mah. ,Antalya,27337
+39,39,Gül Mah.,Kahramanmaraş,35776
+40,40,Çınar Mah.,Mardin,43398
+41,41,Papatya Mah. ,Giresun,71569
+42,42,Atatürk Mah. ,Iğdır,53172
+43,43,Gül Mah. ,Muş,11009
+44,44,Yeni Mah.,Erzurum,52885
+45,45,Cumhuriyet Mah. ,Aydın,21614
+46,46,Cumhuriyet Mah. ,Samsun,38199
+47,47,Cumhuriyet Mah. ,Konya,16931
+48,48,Barış Mah. ,Hatay,76656
+49,49,Atatürk Mah. ,Bingöl,12707
+50,50,Karanfil Mah.,Bartın,37039
+51,51,Karanfil Mah. ,Malatya,75539
+52,52,Yeni Mah.,Isparta,81917
+53,53,Karşıyaka Mah.,Yalova,37524
+54,54,Mimar Sinan Mah. ,Kocaeli,71833
+55,55,Gül Mah. ,Muş,10919
+56,56,Yavuz Selim Mah.,Ardahan,53357
+57,57,Esentepe Mah.,Bilecik,60904
+58,58,Atatürk Mah.,Diyarbakır,61971
+59,59,Yıldız Mah.,İstanbul,37925
+60,60,Gazi Mah. ,Antalya,77802
+61,61,Yeni Mah. ,Hatay,73540
+62,62,Barış Mah. ,Denizli,33116
+63,63,Fatih Mah.,Adana,81413
+64,64,Mimar Sinan Mah.,Hatay,40216
+65,65,Aydınlıkevler Mah.,Siirt,70195
+66,66,Karanfil Mah.,Tunceli,16998
+67,67,Atatürk Mah. ,Tokat,27867
+68,68,Menekşe Mah. ,Bilecik,33280
+69,69,İnönü Mah. ,Tekirdağ,40996
+70,70,Yeni Mah.,Kastamonu,77768
+71,71,Karanfil Mah.,Rize,15970
+72,72,Fatih Mah. ,İstanbul,44531
+73,73,Zafer Mah.,Adıyaman,57507
+74,74,Bahçelievler Mah. ,Bolu,45420
+75,75,Mimar Sinan Mah.,Denizli,20632
+76,76,Atatürk Mah.,Bartın,22209
+77,77,Yıldız Mah. ,Batman,30427
+78,78,Barış Mah. ,Kayseri,11856
+79,79,Gazi Mah. ,Bilecik,68743
+80,80,Hürriyet Mah. ,Iğdır,21216
+81,81,Lale Mah. ,Ankara,53977
+82,82,Karşıyaka Mah. ,Yozgat,10002
+83,83,Papatya Mah. ,Sakarya,32849
+84,84,Bahçelievler Mah. ,Amasya,34867
+85,85,Bahçelievler Mah. ,Sakarya,60362
+86,86,Karanfil Mah. ,Sinop,74837
+87,87,Menekşe Mah. ,Bursa,58555
+88,88,İnönü Mah.,Balıkesir,10258
+89,89,Menekşe Mah. ,Düzce,13109
+90,90,Aydınlıkevler Mah.,Kayseri,26393
+91,91,Esentepe Mah. ,Adıyaman,69563
+92,92,Karanfil Mah. ,Burdur,79548
+93,93,Karanfil Mah. ,Iğdır,38558
+94,94,Papatya Mah. ,Aksaray,19194
+95,95,Merkez Mah. ,Giresun,74562
+96,96,Barış Mah. ,Isparta,25364
+97,97,Cumhuriyet Mah. ,Sakarya,71075
+98,98,Aydınlıkevler Mah. ,Osmaniye,53997
+99,99,Gazi Mah. ,Aksaray,76529
+100,100,Cumhuriyet Mah.,Karabük,33492
+101,101,Fatih Mah.,Malatya,35797
+102,102,Karşıyaka Mah. ,Sakarya,52030
+103,103,Gazi Mah.,Bingöl,47743
+104,104,Cumhuriyet Mah. ,Bolu,10140
+105,105,Çınar Mah. ,İzmir,47933
+106,106,Papatya Mah. ,Uşak,81012
+107,107,Mimar Sinan Mah.,Denizli,78939
+108,108,Papatya Mah. ,Bingöl,80293
+109,109,Yıldız Mah.,Sivas,21831
+110,110,Hürriyet Mah. ,Sivas,35479
+111,111,Karşıyaka Mah.,Antalya,72258
+112,112,Karşıyaka Mah. ,Adıyaman,19750
+113,113,Karşıyaka Mah.,Rize,78130
+114,114,Yeşilyurt Mah. ,İstanbul,36535
+115,115,Atatürk Mah. ,Eskişehir,36082
+116,116,Menekşe Mah. ,Gümüşhane,42875
+117,117,Karşıyaka Mah.,Bilecik,31953
+118,118,Lale Mah.,Ardahan,34692
+119,119,Yeni Mah. ,Konya,37222
+120,120,Çınar Mah.,Isparta,19027
+121,121,İnönü Mah. ,Mersin,78692
+122,122,Gazi Mah. ,Bilecik,73599
+123,123,Hürriyet Mah. ,Niğde,47053
+124,124,İnönü Mah.,Tokat,24432
+125,125,Fatih Mah.,Balıkesir,62427
+126,126,Atatürk Mah. ,Aksaray,61674
+127,127,Cumhuriyet Mah. ,Muş,20857
+128,128,Papatya Mah.,Ardahan,28827
+129,129,Yıldız Mah.,Burdur,12944
+130,130,Yeni Mah.,Ordu,45705
+131,131,Zafer Mah.,Edirne,72904
+132,132,Gazi Mah.,Kayseri,45747
+133,133,Karanfil Mah.,Trabzon,71880
+134,134,Barış Mah. ,Aksaray,33318
+135,135,Yavuz Selim Mah.,Bingöl,24922
+136,136,Bahçelievler Mah.,Çanakkale,40364
+137,137,Yeni Mah.,Niğde,58838
+138,138,Barış Mah.,Sakarya,30056
+139,139,Karanfil Mah. ,Afyonkarahisar,24451
+140,140,Lale Mah.,Kilis,11064
+141,141,Gül Mah.,Denizli,28740
+142,142,Papatya Mah.,Şırnak,24576
+143,143,Merkez Mah.,Denizli,12606
+144,144,Esentepe Mah.,Kırşehir,74271
+145,145,Yeşilyurt Mah.,Uşak,75460
+146,146,Bahçelievler Mah.,Aydın,66995
+147,147,Yavuz Selim Mah.,Mardin,51215
+148,148,Merkez Mah.,Osmaniye,68296
+149,149,Fatih Mah.,Bingöl,10037
+150,150,İnönü Mah.,Kocaeli,35092
+151,151,Cumhuriyet Mah.,Balıkesir,29855
+152,152,Yavuz Selim Mah. ,Çankırı,35673
+153,153,Zafer Mah.,Gümüşhane,44928
+154,154,Yavuz Selim Mah.,Kocaeli,80596
+155,155,Çınar Mah. ,Malatya,51270
+156,156,Gazi Mah. ,Düzce,52135
+157,157,Menekşe Mah.,Aydın,29535
+158,158,Fatih Mah. ,Kilis,58337
+159,159,Zafer Mah.,Balıkesir,74279
+160,160,Yeni Mah. ,Elazığ,30033
+161,161,Karşıyaka Mah. ,Eskişehir,49910
+162,162,Merkez Mah. ,Aksaray,34418
+163,163,Karanfil Mah.,Aydın,50380
+164,164,Barış Mah. ,Karaman,48686
+165,165,Zafer Mah.,Erzincan,51050
+166,166,Cumhuriyet Mah. ,Tekirdağ,16836
+167,167,Hürriyet Mah. ,Karaman,26776
+168,168,Lale Mah. ,Erzincan,38215
+169,169,Yeşilyurt Mah. ,Bursa,51461
+170,170,Zafer Mah. ,Hakkari,32701
+171,171,Karanfil Mah. ,Yalova,16645
+172,172,Barış Mah. ,Bilecik,26882
+173,173,Karanfil Mah.,Mardin,54016
+174,174,Merkez Mah. ,İzmir,47869
+175,175,Mimar Sinan Mah. ,Kahramanmaraş,41960
+176,176,Cumhuriyet Mah. ,Aydın,51376
+177,177,Zafer Mah. ,Mardin,55328
+178,178,Yeni Mah.,Bayburt,21700
+179,179,Zafer Mah.,Zonguldak,76029
+180,180,Esentepe Mah.,Aksaray,40553
+181,181,Cumhuriyet Mah.,Şırnak,69837
+182,182,İnönü Mah. ,Bayburt,60708
+183,183,Mimar Sinan Mah. ,Karabük,17977
+184,184,Cumhuriyet Mah. ,Mersin,65869
+185,185,Barış Mah. ,Gümüşhane,75845
+186,186,Esentepe Mah. ,Ağrı,47861
+187,187,Merkez Mah.,Manisa,57675
+188,188,Karanfil Mah. ,Ardahan,19826
+189,189,Fatih Mah. ,Kütahya,50098
+190,190,Atatürk Mah.,Giresun,30475
+191,191,Yıldız Mah.,Şırnak,30120
+192,192,Fatih Mah. ,İstanbul,36965
+193,193,Çınar Mah. ,Giresun,79188
+194,194,Merkez Mah.,Ardahan,66706
+195,195,Yıldız Mah.,Bartın,51994
+196,196,Fatih Mah. ,Edirne,67031
+197,197,Gazi Mah. ,Bartın,74535
+198,198,Karanfil Mah.,Osmaniye,70723
+199,199,Barış Mah.,Tokat,40326
+200,200,Zafer Mah. ,Ankara,33216
+201,201,Yıldız Mah. ,Antalya,38661
+202,202,Mimar Sinan Mah.,Bitlis,39697
+203,203,Fatih Mah.,Erzincan,78113
+204,204,Atatürk Mah. ,Kayseri,58133
+205,205,Karanfil Mah. ,Balıkesir,46172
+206,206,Gül Mah.,İzmir,47072
+207,207,Karanfil Mah.,Yalova,18505
+208,208,Fatih Mah. ,İstanbul,16991
+209,209,Gazi Mah. ,Van,35376
+210,210,Fatih Mah.,Iğdır,39666
+211,211,Lale Mah.,Ağrı,43108
+212,212,Yavuz Selim Mah. ,Bilecik,77533
+213,213,Fatih Mah.,Bartın,32532
+214,214,Yavuz Selim Mah.,Manisa,12077
+215,215,Çınar Mah.,Kocaeli,77931
+216,216,Barış Mah. ,Artvin,25491
+217,217,Yeşilyurt Mah. ,Tokat,52567
+218,218,Gül Mah.,Ardahan,66774
+219,219,Yeni Mah. ,Bitlis,44530
+220,220,Zafer Mah.,Antalya,68983
+221,221,Karanfil Mah. ,Kastamonu,49986
+222,222,Yıldız Mah.,Muğla,10588
+223,223,İnönü Mah. ,Tokat,45744
+224,224,Gazi Mah. ,Kırıkkale,40273
+225,225,Menekşe Mah.,Hatay,55401
+226,226,Çınar Mah. ,Niğde,79855
+227,227,Yavuz Selim Mah. ,Düzce,31042
+228,228,Menekşe Mah. ,Adana,73057
+229,229,Yıldız Mah.,Iğdır,56215
+230,230,Çınar Mah. ,Kırklareli,40856
+231,231,Mimar Sinan Mah.,Kastamonu,46640
+232,232,Esentepe Mah. ,Kars,66370
+233,233,Fatih Mah. ,Nevşehir,71606
+234,234,Esentepe Mah. ,Burdur,10364
+235,235,Yavuz Selim Mah.,Düzce,44446
+236,236,Bahçelievler Mah.,Hakkari,18027
+237,237,Atatürk Mah. ,Karaman,80193
+238,238,Merkez Mah.,Diyarbakır,61869
+239,239,Yeni Mah. ,İzmir,54834
+240,240,Gül Mah. ,Balıkesir,75447
+241,241,Aydınlıkevler Mah. ,Yalova,68200
+242,242,Karşıyaka Mah. ,İzmir,49821
+243,243,Barış Mah.,Aydın,26364
+244,244,Fatih Mah.,Denizli,21382
+245,245,Barış Mah.,Osmaniye,75614
+246,246,Karşıyaka Mah.,Kırıkkale,53215
+247,247,Karşıyaka Mah. ,Siirt,63896
+248,248,Hürriyet Mah.,Muş,65563
+249,249,Aydınlıkevler Mah.,Amasya,68104
+250,250,Gazi Mah. ,Çorum,76178
+251,251,Menekşe Mah. ,Yalova,68973
+252,252,Yıldız Mah. ,Rize,76360
+253,253,Yeni Mah.,Bolu,43357
+254,254,Merkez Mah. ,Artvin,25325
+255,255,Çınar Mah.,Balıkesir,45846
+256,256,Merkez Mah. ,Bilecik,48562
+257,257,İnönü Mah.,Kahramanmaraş,13826
+258,258,Karşıyaka Mah. ,Uşak,60983
+259,259,Lale Mah.,Antalya,39502
+260,260,Gazi Mah. ,Yalova,50646
+261,261,Papatya Mah.,Tokat,67731
+262,262,Çınar Mah.,Isparta,40265
+263,263,Lale Mah. ,Bitlis,39338
+264,264,Atatürk Mah.,Gümüşhane,30011
+265,265,Aydınlıkevler Mah. ,Karabük,81185
+266,266,Aydınlıkevler Mah. ,Bartın,41922
+267,267,Yeşilyurt Mah. ,İstanbul,41382
+268,268,Gazi Mah.,Artvin,45360
+269,269,Yavuz Selim Mah. ,Zonguldak,77707
+270,270,Lale Mah. ,Düzce,25050
+271,271,Merkez Mah.,Tunceli,81569
+272,272,Bahçelievler Mah. ,Nevşehir,51657
+273,273,Menekşe Mah.,Karaman,67462
+274,274,Fatih Mah. ,Çanakkale,73817
+275,275,İnönü Mah. ,Amasya,80686
+276,276,Merkez Mah. ,Denizli,76941
+277,277,Atatürk Mah. ,Muğla,72619
+278,278,Yıldız Mah.,Balıkesir,64156
+279,279,Karanfil Mah. ,Tekirdağ,53736
+280,280,Lale Mah. ,Denizli,17817
+281,281,Papatya Mah. ,Kırıkkale,44428
+282,282,Fatih Mah.,Adıyaman,50237
+283,283,Merkez Mah. ,Uşak,28493
+284,284,Gazi Mah.,Adıyaman,15485
+285,285,Cumhuriyet Mah. ,Muğla,67699
+286,286,Esentepe Mah.,Hatay,15269
+287,287,Lale Mah. ,Kayseri,14287
+288,288,Yeni Mah. ,Çorum,20957
+289,289,Mimar Sinan Mah. ,Kırıkkale,27296
+290,290,Fatih Mah. ,Artvin,66778
+291,291,Fatih Mah. ,Bartın,18151
+292,292,Yeşilyurt Mah.,Ordu,62028
+293,293,Bahçelievler Mah. ,Kars,19359
+294,294,Yavuz Selim Mah.,Erzurum,28032
+295,295,Esentepe Mah.,Kocaeli,51994
+296,296,Esentepe Mah.,Bilecik,26142
+297,297,Barış Mah. ,Kastamonu,52562
+298,298,Yıldız Mah. ,Kastamonu,61833
+299,299,Karşıyaka Mah. ,Diyarbakır,18032
+300,300,Fatih Mah. ,Tekirdağ,43002
