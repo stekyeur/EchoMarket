@@ -1,0 +1,101 @@
+Name,Price,Rating,Reviews
+Pretzel Deniz Tuzlu 35 gr x 24 Adet,198 TL,3.0,(1)
+Mix Kraker - Balık - Nokta - Badem 150 gr x 14 Adet,319 TL,4.8,(30)
+Pretzel Karışık Çeşnili 200 gr x 2 Adet,96 TL,4.6,(103)
+Mix Kraker Kısa Çubuk - Fiyonk - Halka 150 gr x 14 Adet,319 TL,5.0,(25)
+Mix Kraker - Balık - Nokta - Badem 150 gr x 3 Adet,,4.8,(53)
+Pretzel Deniz Tuzlu 35 gr x 6 Adet,54 TL,3.0,(1)
+Pretzel Tuzlu Mix Maxi Boy Kraker Kısa Çubuk - Fiyonk - Halka 300 gr,48 TL,,
+Mix Kraker Kısa Çubuk - Fiyonk - Halka 150 gr x 3 Adet,79 TL,4.7,(47)
+Fiyonk Kraker 150 gr x 3 Adet,79 TL,4.7,(21)
+Pretzel Maxi Boy Kraker 300 gr,48 TL,,
+Tuzlu Çubuk Kraker 150 gr x 3 Adet,79 TL,4.6,(36)
+KARIŞIK PİRİNÇ KRAKER 500gram,,4.4,(57)
+Poy Baharatlı Kraker 150 gr,"64,99 TL",,
+Fiyonk Kraker 150 gr x 14 Adet,,4.9,(34)
+Anatolia Serisi Kraker 450 gr,,5.0,(2)
+Tereyağlı Kırıkkırak 185 gr X 2 Paket,192 TL,4.0,(22)
+Acılı Fiyonk Kraker Acılı 50 gr x 6 Adet,88 TL,4.8,(41)
+Delikates/ Light Gevrek Ekmek 270 Gr.,"145,90 TL",4.5,(37)
+Tereyağlı Beypazarı Kurusu 1000 gr (KÜÇÜK KESİM),"313,90 TL",4.8,(29)
+Domatesli & Zeytinli Kraker 150 gr,"65,99 TL",,
+Mix Maxi Boy Kraker - Balık - Nokta - Badem 300 gr,48 TL,,
+Dörtlü Nohut Unlu Zeytinyağlı Fit Gevrek Paketi,1.580 TL,5.0,(1)
+Bıs-cottı Selanik Gevreği 200 gr,"79,99 TL",4.0,(52)
+Çaylık Tarihi Beyoğlu Fırını Halka Galeta 200 G,,4.6,(13)
+Akdeniz Sebzeli Bruschette Cips 70 Gr,,,
+Pretzel Deniz Tuzlu 35 gr x 24 Adet,198 TL,3.0,(1)
+Tereyağlı Beypazarı Kurusu 1000 gr (BÜYÜK KESİM),"313,90 TL",4.8,(9)
+Mix Kraker - Balık - Nokta - Badem 150 gr x 14 Adet,319 TL,4.8,(30)
+CHAR ME PARMESANLI GRİSSİNİ,,,
+Pretzel Karışık Çeşnili 200 gr x 2 Adet,96 TL,4.6,(103)
+Çekirdekli Çavdarlı Galeta 500 gr,"374,90 TL",5.0,(5)
+Mix Kraker Kısa Çubuk - Fiyonk - Halka 150 gr x 14 Adet,319 TL,5.0,(25)
+Acılı Fiyonk Kraker Acılı 50 gr x 24 Adet,336 TL,4.9,(8)
+Mix Kraker - Balık - Nokta - Badem 150 gr x 3 Adet,,4.8,(53)
+Mild Cheese Sandwich / Krem Peynirli Sandviç 30 gr X 24 Adet,"848,75 TL",5.0,(12)
+Pretzel Deniz Tuzlu 35 gr x 6 Adet,54 TL,3.0,(1)
+Tarçın Ve Zencefilli Kurabiye 300 gr x 2,390 TL,3.8,(14)
+Mix Kraker Kısa Çubuk - Fiyonk - Halka 150 gr x 3 Adet,79 TL,4.7,(47)
+PEMBE BULDAK SOS,499 TL,,
+Fiyonk Kraker 150 gr x 3 Adet,79 TL,4.7,(21)
+Tahinli Kurabiye,330 TL,4.6,(9)
+Tuzlu Çubuk Kraker 150 gr x 3 Adet,79 TL,4.6,(36)
+Mıxed Rıce Crackers Pirinç Kraker 120 Gr,699 TL,,
+Tarçın Ve Zencefilli Kurabiye 300 gr x 3,,3.9,(15)
+Frenk Kimyonlu Çavdarlı Kraker 200 gr,,4.8,(6)
+Ünseli Ayçekirdekli Organik Diyet Galeta (1 kg),,4.5,(12)
+Sade Gevrek Ekmek Crispbread Original 275 gr,199 TL,4.5,(81)
+Fibre Kraker 230 gr,210 TL,4.8,(13)
+Ülker Çizi Peynirli Kraker 4'lü 280 G,149 TL,4.9,(60)
+Pretzel Deniz Tuzlu 35 gr x 24 Adet,198 TL,3.0,(1)
+Çizi 70 gr,99 TL,5.0,(4)
+Mix Kraker - Balık - Nokta - Badem 150 gr x 14 Adet,319 TL,4.8,(30)
+ÜLKER ÇUBUK 40 GR 36 ADET X 2 PAKET,599 TL,,
+Pretzel Karışık Çeşnili 200 gr x 2 Adet,96 TL,4.6,(103)
+5'Lİ ASYA KORE TARZI KIRMIZI BIBERLI HAMUR ÇUBUK,499 TL,,
+Mix Kraker Kısa Çubuk - Fiyonk - Halka 150 gr x 14 Adet,319 TL,5.0,(25)
+SİSİYEZ PARTYSTAR KRAKER 150G,234 TL,,
+Mix Kraker - Balık - Nokta - Badem 150 gr x 3 Adet,,4.8,(53)
+Cheddar Peynirli Mini Kraker 250 Gr,,,
+Pretzel Deniz Tuzlu 35 gr x 6 Adet,54 TL,3.0,(1)
+Susamlı Kraker 150 gr,205 TL,5.0,(2)
+Mix Kraker Kısa Çubuk - Fiyonk - Halka 150 gr x 3 Adet,79 TL,4.7,(47)
+Galeta,,,
+Fiyonk Kraker 150 gr x 3 Adet,79 TL,4.7,(21)
+Beyaz Karides Ekstraktlı Kraker 227g De&co White Prawn Crackers,"149,99 TL",5.0,(3)
+Tuzlu Çubuk Kraker 150 gr x 3 Adet,79 TL,4.6,(36)
+Ekşi Krema & Soğanli Bruschette Cips 70 Gr,,,
+Kinoa - Chia Tohumlu Mini Kraker 250 Gr,,,
+2'li Ekmek Seti Delikatess Ekmek 270 gr + Original Sade Gevrek Ekmek 275 gr,"351,43 TL",4.7,(3)
+Paprika 100 G Kraker,179 TL,,
+Sade Galeta,,,
+Sesam 3 Adet 200 G,465 TL,5.0,(1)
+Dörtlü Ayçekirdekli Krikkrak Paketi,2.020 TL,,
+Pretzel Deniz Tuzlu 35 gr x 24 Adet,198 TL,3.0,(1)
+İstanbul Halk Ekmek ihe Ayçekirdekli Mini Galeta 200gr,195 TL,,
+Mix Kraker - Balık - Nokta - Badem 150 gr x 14 Adet,319 TL,4.8,(30)
+Ayçekirdekli Gevrek Tereyağlı 180 Gr. (1 PAKET),130 TL,5.0,(1)
+Pretzel Karışık Çeşnili 200 gr x 2 Adet,96 TL,4.6,(103)
+SİSİYEZ TORNADO KRAKER 150G,234 TL,,
+Mix Kraker Kısa Çubuk - Fiyonk - Halka 150 gr x 14 Adet,319 TL,5.0,(25)
+Altınbaşak Grissini Sade 125gr x 12ad,599 TL,5.0,(1)
+Mix Kraker - Balık - Nokta - Badem 150 gr x 3 Adet,,4.8,(53)
+Ülker Çiziviç Peynirli Kremalı Sandviç Kraker 82 G,75 TL,,
+Pretzel Deniz Tuzlu 35 gr x 6 Adet,54 TL,3.0,(1)
+French Herbs/ Baharatlı & Krem Peynirli Sandviç 30 gr X 24 Adet,,3.0,(2)
+Mix Kraker Kısa Çubuk - Fiyonk - Halka 150 gr x 3 Adet,79 TL,4.7,(47)
+Zeytin & Biberiye Kraker 50GR,"236,79 TL",,
+Fiyonk Kraker 150 gr x 3 Adet,79 TL,4.7,(21)
+Dörtlü Biberiyeli Zeytinyağlı Krikkrak Paketi,1.580 TL,,
+Tuzlu Çubuk Kraker 150 gr x 3 Adet,79 TL,4.6,(36)
+Delikatess(lıght) 3 Lü Set,465 TL,,
+Dörtlü Anasonlu Galeta Paketi,1.580 TL,3.0,(2)
+Kepekli Galeta,,5.0,(1)
+Susamlı Galeta,,3.4,(8)
+Susamlı Gevrek Ekmek / Crispbread Sesam 200 G,"214,50 TL",,
+Dörtlü Sorgül Unlu Kars Gravyerli Gevrek Paketi,2.040 TL,5.0,(1)
+SİSİYES RİCHİE GALETA 200G,247 TL,,
+Pretzel Deniz Tuzlu 35 gr x 24 Adet,198 TL,3.0,(1)
+French Herbs/ Baharatlı & Krem Peynirli Sandviç 30 Gr.,95 TL,4.1,(9)
+Mix Kraker - Balık - Nokta - Badem 150 gr x 14 Adet,319 TL,4.8,(30)
