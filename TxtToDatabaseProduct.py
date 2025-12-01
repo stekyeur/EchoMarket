@@ -4,7 +4,7 @@ import pandas as pd
 import psycopg2
 
 # --- AYARLAR ---
-DOSYA_KLASORU = r"C:\Users\arzuf\OneDrive\Belgeler\GitHub\EchoMarket\txtler"
+DOSYA_KLASORU = r"C:\Users\arzuf\OneDrive\Belgeler\GitHub\EchoMarket\txt"
 
 # --- CERRAHİ MÜDAHALE: DOĞRUDAN IP BAĞLANTISI ---
 # 1. Host: İsim yerine doğrudan IP adresini yazıyoruz (DNS hatasını aşar).
