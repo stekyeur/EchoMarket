@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>EchoMarket - Hoş Geldiniz</title>
+    <style>
+        /* SİYAH-SARI YÜKSEK KONTRAST TEMA */
+        body {
+            background-color: #000000;
+            color: #FFFF00;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+            overflow: hidden; /* Sayfanın kaymasını tamamen engeller */
+        }
+
+        h1 { font-size: 60px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 5px; }
+        p { font-size: 30px; color: #FFFFFF; margin-bottom: 50px; max-width: 800px; line-height: 1.5; }
+
+        /* BAŞLANGIÇ PERDESİ (Overlay) */
+        #start-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.95);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999; cursor: pointer;
+        }
+        .start-message {
+            font-size: 40px; color: #00FF00; font-weight: bold;
+            border: 4px solid #00FF00; padding: 50px; border-radius: 20px;
+            animation: pulse-border 2s infinite;
+        }
+        @keyframes pulse-border { 0% {box-shadow: 0 0 0 0 rgba(0,255,0,0.7);} 70% {box-shadow: 0 0 0 20px rgba(0,255,0,0);} 100% {box-shadow: 0 0 0 0 rgba(0,255,0,0);} }
+
+        /* MİKROFON */
+        .mic-button {
+            width: 200px; height: 200px; border-radius: 50%;
+            background: linear-gradient(135deg, #FFFF00 0%, #FFD700 100%);
+            border: 8px solid #FFFFFF;
+            font-size: 80px; cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            margin-bottom: 50px; transition: transform 0.2s;
+        }
+        .mic-button:hover { transform: scale(1.1); }
+        .mic-button.listening {
+            background: #00FF00;
+            animation: pulse 1.5s infinite;
+            box-shadow: 0 0 50px #00FF00;
+        }
+        @keyframes pulse { 0% {box-shadow: 0 0 0 0 rgba(0,255,0,0.7);} 70% {box-shadow: 0 0 0 30px rgba(0,255,0,0);} 100% {box-shadow: 0 0 0 0 rgba(0,255,0,0);} }
+
+        /* BUTONLAR */
+        .choice-container { display: flex; gap: 40px; width: 100%; max-width: 800px; }
+        .big-btn {
+            flex: 1; padding: 40px; font-size: 36px; font-weight: bold;
+            background: #1A1A1A; color: #fff; border: 4px solid #FFFF00;
+            border-radius: 20px; cursor: pointer; transition: all 0.3s;
+            text-decoration: none; display: block;
+        }
+        .big-btn:hover, .big-btn:focus { background: #333; border-color: #00FFFF; color: #00FFFF; transform: translateY(-5px); }
+        a { text-decoration: none; color: inherit; width: 100%; }
+    </style>
+</head>
+<body>
+
+<div id="start-overlay" onclick="startApp()">
+    <div class="start-message">BAŞLATMAK İÇİN<br>TIKLAYIN VEYA SPACE'E BASIN</div>
+</div>
+
+<h1>EchoMarket</h1>
+<p>Hoş geldiniz. Giriş yapmak için <b>"Giriş"</b>, kayıt olmak için <b>"Kayıt"</b> deyin.</p>
+
+<button id="micButton" class="mic-button">🎤</button>
+<div id="status" style="font-size: 24px; color: #fff; margin-bottom: 20px; min-height: 30px;">Mikrofona basın</div>
+
+<div class="choice-container">
+    <a href="/login"><button class="big-btn">GİRİŞ YAP</button></a>
+    <a href="/register"><button class="big-btn">KAYIT OL</button></a>
+</div>
+
+<script>
+    const micButton = document.getElementById('micButton');
+    const statusDiv = document.getElementById('status');
+    const overlay = document.getElementById('start-overlay');
+    let isListening = false;
+
+    // UYGULAMAYI BAŞLAT
+    function startApp() {
+        overlay.style.display = 'none';
+        // true: Konuşma bitince otomatik dinlemeye geç
+        speak("Echo Market'e hoş geldiniz. Giriş yapmak mı istersiniz, kayıt olmak mı?", true);
+    }
+
+    // KONUŞMA FONKSİYONU
+    function speak(text, autoListen = false) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'tr-TR'; u.rate = 0.9; u.volume = 1;
+
+        u.onend = function() {
+            if (autoListen) {
+                startListening();
+            }
+        };
+        window.speechSynthesis.speak(u);
+    }
+
+    // DİNLEMEYİ BAŞLAT
+    function startListening() {
+        if(isListening) return;
+        isListening = true;
+        micButton.classList.add('listening');
+        statusDiv.textContent = "Dinliyorum...";
+        setTimeout(listen, 500);
+    }
+
+    // DİNLEMEYİ DURDUR
+    function stopListening() {
+        isListening = false;
+        micButton.classList.remove('listening');
+        statusDiv.textContent = "Mikrofona basın";
+    }
+
+    // MANUEL TETİKLEME
+    function toggleMic() {
+        if(isListening) {
+            stopListening();
+            speak("İptal edildi.");
+            return;
+        }
+        speak("Dinliyorum.", true);
+    }
+
+    // SES TANIMA
+    async function listen() {
+        if(!isListening) return;
+        try {
+            const res = await fetch('/dinle', {method:'POST'});
+            const data = await res.json();
+
+            if(data.status === 'success') {
+                let cmd = data.command.toLowerCase();
+                statusDiv.textContent = "Algılandı: " + cmd;
+
+                if(cmd.includes('giriş') || cmd.includes('giris')) {
+                    speak("Giriş ekranına yönlendiriliyorsunuz.");
+                    setTimeout(() => window.location.href = "/login", 1500);
+                }
+                else if(cmd.includes('kayıt') || cmd.includes('kaydol')) {
+                    speak("Kayıt ekranına yönlendiriliyorsunuz.");
+                    setTimeout(() => window.location.href = "/register", 1500);
+                }
+                else {
+                    speak("Anlaşılamadı. Giriş mi, Kayıt mı?", true);
+                }
+            } else {
+                speak("Ses gelmedi.", false); // Ses gelmezse tekrar sormasın, sussun.
+                stopListening();
+            }
+        } catch(e) {
+            speak("Hata oluştu.");
+            stopListening();
+        }
+    }
+
+    micButton.addEventListener('click', toggleMic);
+
+    // --- KLAVYE KONTROLÜ (SPACE TUŞU DÜZELTMESİ) ---
+    document.addEventListener('keydown', (e) => {
+        // Space tuşuna basıldıysa
+        if(e.code === 'Space' || e.key === ' ') {
+
+            e.preventDefault(); // <--- İŞTE BU SATIR SAYFANIN KAYMASINI ENGELLER!
+
+            if(overlay.style.display !== 'none') {
+                startApp();
+            } else {
+                toggleMic();
+            }
+        }
+    });
+</script>
+</body>
+</html>

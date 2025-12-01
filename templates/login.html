@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EchoMarket - Kullanıcı Girişi</title>
+    <style>
+        /* --- ERİŞİLEBİLİRLİK ODAKLI CSS --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            background-color: #000000;
+            color: #FFFF00;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            font-size: 24px;
+            line-height: 1.6;
+            overflow: hidden; /* Sayfa kaymasını engelle */
+        }
+
+        .container { width: 100%; max-width: 800px; text-align: center; }
+        h1 { font-size: 48px; margin-bottom: 40px; font-weight: bold; color: #FFFF00; }
+        .voice-control-section { margin-bottom: 60px; }
+
+        /* BAŞLANGIÇ PERDESİ (Overlay) */
+        #start-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.95);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999; cursor: pointer;
+        }
+        .start-message {
+            font-size: 40px; color: #00FF00; font-weight: bold;
+            border: 4px solid #00FF00; padding: 50px; border-radius: 20px;
+            animation: pulse-border 2s infinite;
+        }
+        @keyframes pulse-border { 0% {box-shadow: 0 0 0 0 rgba(0,255,0,0.7);} 70% {box-shadow: 0 0 0 20px rgba(0,255,0,0);} 100% {box-shadow: 0 0 0 0 rgba(0,255,0,0);} }
+
+        /* MİKROFON BUTONU */
+        .mic-button {
+            width: 200px; height: 200px; border-radius: 50%;
+            background: linear-gradient(135deg, #FFFF00 0%, #FFD700 100%);
+            border: 6px solid #FFFFFF; cursor: pointer; display: flex;
+            align-items: center; justify-content: center; margin: 0 auto 30px;
+            transition: all 0.3s ease; position: relative;
+        }
+        .mic-button:hover { transform: scale(1.1); box-shadow: 0 0 40px rgba(255, 255, 0, 0.8); }
+        .mic-button:focus { outline: 8px solid #00FFFF; outline-offset: 8px; box-shadow: 0 0 50px rgba(0, 255, 255, 0.9); }
+        .mic-button:active { transform: scale(0.95); }
+
+        .mic-button.listening {
+            animation: pulse 1.5s infinite;
+            background: linear-gradient(135deg, #00FF00 0%, #00CC00 100%);
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 40px rgba(0, 255, 0, 0.8); }
+            50% { box-shadow: 0 0 80px rgba(0, 255, 0, 1); }
+        }
+
+        .mic-icon { font-size: 80px; color: #000000; }
+        .voice-status { font-size: 28px; color: #FFFFFF; font-weight: bold; min-height: 40px; }
+
+        /* FORM ALANLARI */
+        .form-section { margin-top: 60px; }
+        .input-group { margin-bottom: 40px; }
+
+        label { display: block; font-size: 28px; font-weight: bold; margin-bottom: 15px; text-align: left; color: #FFFF00; }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%; padding: 25px 30px; font-size: 28px;
+            background-color: #1A1A1A; color: #FFFFFF;
+            border: 4px solid #FFFF00; border-radius: 12px; transition: all 0.3s ease;
+        }
+        input:focus {
+            outline: 8px solid #00FFFF; outline-offset: 4px;
+            border-color: #00FFFF; background-color: #2A2A2A;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
+        }
+        input::placeholder { color: #888888; font-size: 24px; }
+
+        /* BUTONLAR */
+        .button-group { display: flex; gap: 30px; margin-top: 50px; flex-wrap: wrap; }
+
+        button {
+            flex: 1; min-width: 250px; padding: 30px 40px; font-size: 32px;
+            font-weight: bold; background-color: #FFFF00; color: #000000;
+            border: 4px solid #FFFF00; border-radius: 12px; cursor: pointer; transition: all 0.3s ease;
+        }
+        button:hover { background-color: #FFD700; transform: translateY(-4px); box-shadow: 0 8px 30px rgba(255, 255, 0, 0.5); }
+        button:focus { outline: 8px solid #00FFFF; outline-offset: 6px; box-shadow: 0 0 40px rgba(0, 255, 255, 0.8); }
+
+        .secondary-button { background-color: transparent; color: #FFFFFF; border-color: #FFFFFF; }
+        .secondary-button:hover { background-color: #333333; border-color: #00FFFF; color: #00FFFF; }
+
+        /* BİLDİRİM KUTUSU */
+        .notification {
+            position: fixed; top: 20px; right: 20px; padding: 30px 40px;
+            background-color: #00FF00; color: #000000; font-size: 28px;
+            font-weight: bold; border-radius: 12px; border: 4px solid #FFFFFF;
+            box-shadow: 0 8px 40px rgba(0, 255, 0, 0.6); opacity: 0;
+            transform: translateX(400px); transition: all 0.5s ease; z-index: 1000;
+        }
+        .notification.show { opacity: 1; transform: translateX(0); }
+        .notification.error { background-color: #FF0000; color: #FFFFFF; }
+
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 36px; }
+            .mic-button { width: 160px; height: 160px; }
+            .mic-icon { font-size: 60px; }
+            .button-group { flex-direction: column; }
+            button { min-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="start-overlay" onclick="startApp()">
+    <div class="start-message">GİRİŞ EKRANI<br>BAŞLATMAK İÇİN TIKLAYIN<br>VEYA SPACE'E BASIN</div>
+</div>
+
+<a href="#main-content" class="skip-link sr-only">Ana içeriğe geç</a>
+
+<div class="container" id="main-content" role="main">
+    <h1>EchoMarket Giriş</h1>
+
+    <div class="voice-control-section" role="region" aria-label="Sesli komut bölümü">
+        <button
+                class="mic-button"
+                id="micButton"
+                aria-label="Sesli komut vermek için mikrofon butonuna basın veya Space tuşuna basın"
+                aria-pressed="false"
+                type="button">
+            <span class="mic-icon" aria-hidden="true">🎤</span>
+        </button>
+        <div class="voice-status" id="voiceStatus" aria-live="polite" aria-atomic="true">
+            Sesli komut için mikrofona basın
+        </div>
+    </div>
+
+    <form class="form-section" id="loginForm" novalidate>
+        <div class="input-group">
+            <label for="email">E-posta Adresi</label>
+            <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    aria-label="E-posta adresinizi girin"
+                    aria-required="true"
+                    aria-describedby="email-help"
+                    placeholder="ornek@email.com"
+                    autocomplete="email">
+            <span id="email-help" class="sr-only">E-posta adresinizi eksiksiz girin</span>
+        </div>
+        <div class="input-group">
+            <label for="password">Şifre</label>
+            <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    aria-label="Şifrenizi girin"
+                    aria-required="true"
+                    aria-describedby="password-help"
+                    placeholder="Şifreniz"
+                    autocomplete="current-password">
+            <span id="password-help" class="sr-only">Şifrenizi girin</span>
+        </div>
+
+        <div class="button-group">
+            <button
+                    type="submit"
+                    id="loginButton"
+                    aria-label="Giriş yap butonuna tıklayın">
+                Giriş Yap
+            </button>
+            <button
+                    type="button"
+                    class="secondary-button"
+                    id="registerButton"
+                    aria-label="Yeni hesap oluştur">
+                Kayıt Ol
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="notification" id="notification" role="alert" aria-live="assertive"></div>
+
+<script>
+    const micButton = document.getElementById('micButton');
+    const voiceStatus = document.getElementById('voiceStatus');
+    const loginForm = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const notification = document.getElementById('notification');
+    const loginButton = document.getElementById('loginButton');
+    const registerButton = document.getElementById('registerButton');
+    const overlay = document.getElementById('start-overlay');
+
+    let isListening = false;
+
+    // --- BAŞLATMA FONKSİYONU ---
+    function startApp() {
+        overlay.style.display = 'none';
+        // Otomatik başlat ve ne yapması gerektiğini söyle
+        speak("Giriş ekranındasınız. Lütfen e-posta adresinizi söyleyin.", true);
+    }
+
+    // --- YARDIMCI: Yazı rakamlarını sayıya çevir ---
+    function textToNumbers(text) {
+        const numbers = {
+            'bir': '1', 'iki': '2', 'üç': '3', 'dört': '4', 'beş': '5',
+            'altı': '6', 'yedi': '7', 'sekiz': '8', 'dokuz': '9', 'sıfır': '0'
+        };
+        return text.split(' ').map(word => numbers[word] || word).join(' ');
+    }
+
+    // --- SESLİ GERİ BİLDİRİM (TTS) ---
+    function speak(text, autoListen = false) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'tr-TR';
+        utterance.rate = 0.9;
+        utterance.volume = 1;
+
+        utterance.onend = function() {
+            if (autoListen) {
+                startListening();
+            }
+        };
+
+        window.speechSynthesis.speak(utterance);
+    }
+
+    // --- GÖRSEL BİLDİRİM ---
+    function showNotification(message, isError = false) {
+        notification.textContent = message;
+        notification.className = 'notification show' + (isError ? ' error' : '');
+        setTimeout(() => notification.classList.remove('show'), 4000);
+    }
+
+    // --- MİKROFON YÖNETİMİ ---
+    function startListening() {
+        if(isListening) return;
+        isListening = true;
+        micButton.classList.add('listening');
+        voiceStatus.textContent = "Dinliyorum...";
+        showNotification('Dinliyorum...');
+        setTimeout(listen, 500);
+    }
+
+    function stopListening() {
+        isListening = false;
+        micButton.classList.remove('listening');
+        voiceStatus.textContent = 'Sesli komut için mikrofona basın';
+    }
+
+    function toggleVoiceCommand() {
+        if (isListening) {
+            stopListening();
+            speak("İptal edildi.");
+            return;
+        }
+        speak("Dinliyorum.", true);
+    }
+
+    // --- ANA MANTIK ---
+    async function listen() {
+        if (!isListening) return;
+
+        try {
+            const response = await fetch('/dinle', { method: 'POST' });
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                let rawCommand = data.command.toLowerCase().trim();
+                showNotification(`Duyulan: "${rawCommand}"`);
+                console.log("Ham Veri:", rawCommand);
+
+                // 1. ÖNCELİK: SİLME (YANLIŞSA SİL DEYİN KISMI)
+                if (rawCommand.includes('yanlış') || rawCommand.includes('sil') || rawCommand.includes('temizle') || rawCommand.includes('hayır')) {
+                    emailInput.value = "";
+                    passwordInput.value = "";
+                    showNotification("Temizlendi.");
+                    // HATA DÜZELTME MESAJI BURADA:
+                    speak("Alanlar temizlendi. Lütfen e-postanızı tekrar söyleyin.", true);
+                    return;
+                }
+
+                // 2. ÖNCELİK: BUTONLAR
+                if (rawCommand.includes('giriş yap')) {
+                    speak("Giriş yapılıyor.");
+                    setTimeout(() => loginButton.click(), 500);
+                    return;
+                }
+                if (rawCommand.includes('kayıt ol')) {
+                    speak("Kayıt sayfasına gidiliyor.");
+                    setTimeout(() => registerButton.click(), 500);
+                    return;
+                }
+
+                // 3. ÖNCELİK: E-POSTA
+                let processedText = rawCommand
+                    .replace(/^(email yaz|e-posta yaz|posta yaz)/g, '')
+                    .replace(/(?:\s|^)(nokta|dıt|dat|dot)(?:\s|$)/g, '.')
+                    .replace(/(?:\s|^)(et|at)(?:\s|$)/g, '@')
+                    .replace(/\s+/g, '');
+
+                const trMap = {'ğ':'g', 'ü':'u', 'ş':'s', 'ı':'i', 'ö':'o', 'ç':'c'};
+                let emailCandidate = processedText.replace(/[ğüşıöç]/g, s => trMap[s]);
+
+                if (emailCandidate.includes('@') || emailCandidate.includes('gmail') || emailCandidate.includes('hotmail') || emailCandidate.includes('.com')) {
+                    if (!emailCandidate.includes('@')) {
+                        if (emailCandidate.includes('gmail')) emailCandidate = emailCandidate.replace('gmail', '@gmail');
+                        if (emailCandidate.includes('hotmail')) emailCandidate = emailCandidate.replace('hotmail', '@hotmail');
+                    }
+                    emailInput.value = emailCandidate;
+                    emailInput.focus();
+
+                    let readableEmail = emailCandidate.replace('@', ' et ').replace(/\./g, ' nokta ');
+
+                    // TEYİT MESAJI BURADA GÜNCELLENDİ:
+                    speak(`E-posta: ${readableEmail}. Doğruysa şifreyi söyleyin, yanlışsa sil deyin.`, true);
+                }
+
+                // 4. ÖNCELİK: ŞİFRE
+                else {
+                    let passText = rawCommand.replace(/^(şifre yaz|parola yaz|şifre|parola)/g, '').trim();
+                    passText = textToNumbers(passText).replace(/\s+/g, '');
+
+                    if (passText.length > 0) {
+                        passwordInput.value = passText;
+                        passwordInput.focus();
+
+                        // TEYİT MESAJI BURADA GÜNCELLENDİ:
+                        speak("Şifre girildi. Doğruysa giriş yap deyin, yanlışsa sil deyin.", true);
+                    } else {
+                        speak("Anlaşılamadı. Tekrar söyleyin.", true);
+                    }
+                }
+
+            } else {
+                speak("Ses gelmedi.", false);
+                stopListening();
+            }
+
+        } catch (error) {
+            console.error('Hata:', error);
+            speak("Bir hata oluştu.");
+            stopListening();
+        }
+    }
+
+    // --- KLAVYE KONTROLÜ (SPACE DÜZELTMESİ) ---
+    micButton.addEventListener('click', toggleVoiceCommand);
+
+    document.addEventListener('keydown', (e) => {
+        // Space tuşunu yakala
+        if (e.code === 'Space' || e.key === ' ') {
+
+            e.preventDefault(); // <--- SAYFAYI AŞAĞI KAYDIRMAYI ENGELLER
+
+            if(overlay.style.display !== 'none') {
+                startApp();
+            } else {
+                toggleVoiceCommand();
+            }
+        }
+    });
+
+    // Form Gönderme
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = emailInput.value.trim();
+        const password = passwordInput.value.trim();
+        if (!email || !password) {
+            speak("Lütfen e-posta ve şifreyi doldurun.");
+            return;
+        }
+        console.log("Form gönderildi.");
+        // Burada backend bağlantısı olacak...
+    });
+</script>
+</body>
+</html>
