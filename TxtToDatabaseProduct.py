@@ -1,24 +1,12 @@
-
 import os
 import pandas as pd
 import psycopg2
+# config.py dosyasından DB_CONFIG'i çekiyoruz
+# Not: config.py ile bu dosya aynı klasörde olmalı.
+from config import DB_CONFIG
 
 # --- AYARLAR ---
-DOSYA_KLASORU = r"C:\Users\arzuf\OneDrive\Belgeler\GitHub\EchoMarket\txt"
-
-# --- CERRAHİ MÜDAHALE: DOĞRUDAN IP BAĞLANTISI ---
-# 1. Host: İsim yerine doğrudan IP adresini yazıyoruz (DNS hatasını aşar).
-# 2. User: 'postgres' yazıyoruz (Doğrudan bağlantıda uzun isme gerek yoktur, Tenant hatasını aşar).
-# 3. SSL: 'prefer' yapıyoruz (IP ile bağlandığımızda sertifika ismi uyuşmazlığı olmasın diye).
-
-DB_CONFIG = {
-    "host": "aws-1-ap-southeast-2.pooler.supabase.com",      # <-- DNS'i bypass ediyoruz (Loglardan aldığımız IP)
-    "port": "5432",
-    "dbname": "postgres",
-    "user": "postgres.zhulbmvyuszoiutbthpu",           # <-- Sadece 'postgres' (Tenant hatasını çözer)
-    "password": "RYca&61au.aMk2//307", 
-              # <-- 'require' yerine 'prefer' (IP bağlantısı için şart)
-}
+DOSYA_KLASORU = r"C:\Users\arzuf\OneDrive\Belgeler\GitHub\EchoMarket\txt_2" # Klasör yolunu kontrol edin
 
 # --- TEMİZLİK FONKSİYONLARI ---
 def fiyat_temizle(fiyat_str):
@@ -33,22 +21,22 @@ def fiyat_temizle(fiyat_str):
         return 0.0
 
 def veri_aktar():
-    print("\n--- DOĞRUDAN IP BAĞLANTISI DENEMESİ ---")
-    print(f"Hedef IP: {DB_CONFIG['host']}")
-    print("Durum: DNS ve Pooler devre dışı bırakıldı, doğrudan bağlanılıyor...")
+    print("\n--- ÜRÜN AKTARIM (Config ile) ---")
     
     conn = None
     try:
-        # Bağlantıyı kur
-        conn = psycopg2.connect(**DB_CONFIG)
+        # Config dosyasındaki ayarları kullanıyoruz
+        connect_params = DB_CONFIG.copy()
+        if 'sslmode' not in connect_params:
+            connect_params['sslmode'] = 'prefer'
+
+        print(f"Bağlanılıyor: {connect_params['host']}...")
+        conn = psycopg2.connect(**connect_params)
         cursor = conn.cursor()
-        print("\n✅ BAŞARILI! Veritabanına bağlandık.")
-        print("   Bu yöntemle tüm engelleri aştık.\n")
+        print("✅ Veritabanına başarıyla bağlanıldı.")
     except Exception as e:
-        print("\n❌ BAĞLANTI HATASI:")
+        print("❌ BAĞLANTI HATASI:")
         print(e)
-        print("\nNOT: Eğer bu da çalışmazsa, IP adresi değişmiş olabilir.")
-        print("pgAdmin'de 'Connection' sekmesinde yazan IP adresini kontrol edelim.")
         return
 
     # Klasör kontrolü
@@ -98,6 +86,9 @@ def veri_aktar():
 
                     fiyat = fiyat_temizle(row.get('Price'))
                     
+                    # Veritabanına Ekle (Çift kayıt olmaması için ON CONFLICT ekledik)
+                    # Not: ON CONFLICT çalışması için Name alanının unique olması gerekir, 
+                    # değilse bile bu kod hata vermeden çalışır.
                     cursor.execute("""
                         INSERT INTO Product (Name, Description, Price, Stock, CategoryID, UnitOfMeasure)
                         VALUES (%s, %s, %s, %s, %s, %s)

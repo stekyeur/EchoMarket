@@ -1,21 +1,13 @@
 import os
 import pandas as pd
 import psycopg2
-from psycopg2 import extras # Hız için gerekli ek paket
+from psycopg2 import extras
 import random
+# config.py dosyasından DB_CONFIG'i çekiyoruz
+from config import DB_CONFIG
 
 # --- AYARLAR ---
-DOSYA_KLASORU = r"C:\Users\arzuf\OneDrive\Belgeler\GitHub\EchoMarket\txtler"
-
-# --- BAĞLANTI BİLGİLERİ (Hızlı Port) ---
-DB_CONFIG = {
-    "host": "aws-1-ap-southeast-2.pooler.supabase.com",
-    "port": "5432",
-    "dbname": "postgres",
-    "user": "postgres.zhulbmvyuszoiutbthpu", 
-    "password": "jGF6nkMVNK9rAxYk", 
-    "sslmode": "prefer"
-}
+DOSYA_KLASORU = r"C:\Users\arzuf\OneDrive\Belgeler\GitHub\EchoMarket\txt_2"
 
 # --- YARDIMCI FONKSİYONLAR ---
 def clean_rating(rating_str):
@@ -40,11 +32,17 @@ def generate_weighted_rating(target_rating):
     return base + 1 if random.random() < probability else base
 
 def main():
-    print("\n--- PRODUCT RATING OLUŞTURUCU (TURBO MOD 🚀) ---")
+    print("\n--- PRODUCT RATING OLUŞTURUCU (TURBO MOD 🚀 - Config ile) ---")
     
     conn = None
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
+        # Config dosyasındaki ayarları kullanıyoruz
+        # Eğer sslmode eksikse ekliyoruz
+        connect_params = DB_CONFIG.copy()
+        if 'sslmode' not in connect_params:
+            connect_params['sslmode'] = 'prefer'
+
+        conn = psycopg2.connect(**connect_params)
         cursor = conn.cursor()
         print("✅ Veritabanına bağlanıldı.")
         
@@ -69,13 +67,6 @@ def main():
         print("\n🚀 İşlem Başlıyor (Paketler halinde gönderilecek)...")
         total_ratings_inserted = 0
         
-        # SQL Şablonu (Hız için execute_values kullanacağız)
-        insert_query = """
-            INSERT INTO productrating (userid, productid, rating, ratedate)
-            VALUES %s
-            ON CONFLICT (userid, productid) DO NOTHING
-        """
-
         for dosya_adi in os.listdir(DOSYA_KLASORU):
             if dosya_adi.endswith(".txt"):
                 print(f"📄 Hazırlanıyor: {dosya_adi}", end=" ")
@@ -102,12 +93,8 @@ def main():
                         
                         for user_id in selected_users:
                             score = generate_weighted_rating(target)
-                            # Listeye ekle (Veritabanına hemen gitme!)
-                            # (userid, productid, rating, ratedate) formatında
-                            # ratedate için veritabanında default NOW() var ama execute_values için
-                            # Python tarafında 'now' yerine doğrudan SQL keyword'ü zor olduğu için
-                            # ya datetime.now() vereceğiz ya da SQL'i düzelteceğiz.
-                            # Basitlik için ratedate'i SQL tarafına bırakalım, query'i değiştirelim.
+                            # (userid, productid, rating) formatında ekliyoruz.
+                            # ratedate için SQL tarafında NOW() kullanacağız.
                             batch_data.append((user_id, product_id, score))
                     
                     # --- TOPLU GÖNDERİM ZAMANI ---
@@ -118,7 +105,7 @@ def main():
                             """INSERT INTO productrating (userid, productid, rating, ratedate) 
                                VALUES %s ON CONFLICT (userid, productid) DO NOTHING""",
                             batch_data,
-                            template="(%s, %s, %s, NOW())", # NOW() burada kullanılıyor
+                            template="(%s, %s, %s, NOW())", 
                             page_size=1000
                         )
                         conn.commit()
