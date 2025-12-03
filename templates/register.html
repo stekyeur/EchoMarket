@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EchoMarket - Kayıt Ol</title>
+    <style>
+        /* --- ERİŞİLEBİLİRLİK ODAKLI CSS (YÜKSEK KONTRAST) --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            background-color: #000000;
+            color: #FFFF00;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            font-size: 24px;
+            line-height: 1.6;
+        }
+
+        .container { width: 100%; max-width: 800px; text-align: center; margin-top: 20px; margin-bottom: 50px; }
+        h1 { font-size: 48px; margin-bottom: 30px; font-weight: bold; color: #FFFF00; }
+
+        /* BAŞLANGIÇ PERDESİ (Overlay) */
+        #start-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.95);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999; cursor: pointer;
+        }
+        .start-message {
+            font-size: 40px; color: #00FF00; font-weight: bold;
+            border: 4px solid #00FF00; padding: 50px; border-radius: 20px;
+            animation: pulse-border 2s infinite; text-align: center;
+        }
+        @keyframes pulse-border { 0% {box-shadow: 0 0 0 0 rgba(0,255,0,0.7);} 70% {box-shadow: 0 0 0 20px rgba(0,255,0,0);} 100% {box-shadow: 0 0 0 0 rgba(0,255,0,0);} }
+
+        /* MİKROFON BUTONU */
+        .mic-button {
+            width: 150px; height: 150px; border-radius: 50%;
+            background: linear-gradient(135deg, #FFFF00 0%, #FFD700 100%);
+            border: 6px solid #FFFFFF; cursor: pointer; display: flex;
+            align-items: center; justify-content: center; margin: 0 auto 20px;
+            transition: all 0.3s ease;
+        }
+        .mic-button:hover { transform: scale(1.1); box-shadow: 0 0 40px rgba(255, 255, 0, 0.8); }
+        .mic-button.listening {
+            animation: pulse 1.5s infinite;
+            background: linear-gradient(135deg, #00FF00 0%, #00CC00 100%);
+        }
+        @keyframes pulse { 0% {box-shadow: 0 0 40px rgba(0, 255, 0, 0.8);} 50% {box-shadow: 0 0 80px rgba(0, 255, 0, 1);} }
+
+        .mic-icon { font-size: 60px; color: #000000; }
+        .voice-status { font-size: 24px; color: #FFFFFF; font-weight: bold; min-height: 30px; margin-bottom: 30px; }
+
+        /* FORM ALANLARI */
+        .section-title { text-align: left; color: #00FFFF; margin-top: 30px; margin-bottom: 10px; font-size: 28px; border-bottom: 2px solid #00FFFF; padding-bottom: 5px; }
+
+        input {
+            width: 100%; padding: 20px; margin-bottom: 15px; font-size: 24px;
+            background-color: #1A1A1A; color: #FFFFFF;
+            border: 3px solid #FFFF00; border-radius: 10px; transition: all 0.3s ease;
+        }
+        /* Aktif olan input alanı daha belirgin olsun */
+        input:focus {
+            outline: none; border-color: #00FF00; background-color: #2A2A2A;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.8); transform: scale(1.02);
+        }
+        input::placeholder { color: #888; }
+
+        button {
+            padding: 25px; font-size: 32px; background: #FFFF00; color: #000;
+            font-weight: bold; cursor: pointer; margin-top: 30px; width: 100%;
+            border: 4px solid #FFFF00; border-radius: 15px;
+        }
+        button:hover { background: #FFD700; transform: translateY(-3px); }
+
+        /* BİLDİRİM */
+        .notification {
+            position: fixed; top: 20px; right: 20px; padding: 30px;
+            background-color: #00FF00; color: #000; font-size: 24px; font-weight: bold;
+            border-radius: 12px; border: 4px solid #fff; opacity: 0;
+            transition: opacity 0.5s; z-index: 1000; pointer-events: none;
+        }
+        .notification.show { opacity: 1; }
+        .notification.error { background-color: #FF0000; color: #fff; }
+
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+    </style>
+</head>
+<body>
+
+<!-- BAŞLANGIÇ PERDESİ -->
+<div id="start-overlay" onclick="startApp()">
+    <div class="start-message">KAYIT EKRANI<br>BAŞLATMAK İÇİN TIKLAYIN<br>VEYA SPACE'E BASIN</div>
+</div>
+
+<div class="container">
+    <h1>Kayıt Ol</h1>
+
+    <button class="mic-button" id="micButton" aria-label="Mikrofon">
+        <span class="mic-icon">🎤</span>
+    </button>
+    <div class="voice-status" id="status">Mikrofona basın</div>
+
+    <div class="section-title">KİŞİSEL BİLGİLER</div>
+    <input type="text" id="fullname" placeholder="Ad Soyad">
+    <input type="email" id="email" placeholder="E-posta">
+    <input type="text" id="phone" placeholder="Telefon (90...)">
+
+    <div class="section-title">ADRES BİLGİLERİ</div>
+    <input type="text" id="city" placeholder="Şehir / İl">
+    <input type="text" id="zipcode" placeholder="Posta Kodu">
+    <input type="text" id="street" placeholder="Cadde, Sokak, Kapı No">
+
+    <div class="section-title">GÜVENLİK</div>
+    <input type="password" id="password" placeholder="Şifre">
+
+    <button id="registerBtn">KAYDI TAMAMLA</button>
+</div>
+
+<div class="notification" id="notification"></div>
+
+<script>
+    const micButton = document.getElementById('micButton');
+    const statusDiv = document.getElementById('status');
+    const overlay = document.getElementById('start-overlay');
+    const notification = document.getElementById('notification');
+
+    // Form Elemanları
+    const fields = {
+        fullname: document.getElementById('fullname'),
+        email: document.getElementById('email'),
+        phone: document.getElementById('phone'),
+        city: document.getElementById('city'),
+        zipcode: document.getElementById('zipcode'),
+        street: document.getElementById('street'),
+        password: document.getElementById('password')
+    };
+    const registerBtn = document.getElementById('registerBtn');
+
+    // --- SIRALI DOLDURMA MODU (WIZARD) AYARLARI ---
+    let isGuidedMode = false;
+    let currentStepIndex = 0;
+    // Sırayla sorulacak alanlar ve soruları
+    const steps = [
+        { key: 'fullname', question: "Lütfen adınızı ve soyadınızı söyleyin." },
+        { key: 'email',    question: "E-posta adresinizi söyleyin." },
+        { key: 'phone',    question: "Telefon numaranızı başında 90 olarak söyleyin." },
+        { key: 'city',     question: "Hangi şehirde yaşıyorsunuz?" },
+        { key: 'zipcode',  question: "Posta kodunuz nedir?" },
+        { key: 'street',   question: "Mahalle, cadde, sokak ve kapı numarası bilgisini söyleyin." },
+        { key: 'password', question: "Son olarak, bir şifre belirleyin." }
+    ];
+
+    let isListening = false;
+
+    // --- UYGULAMA BAŞLATMA ---
+    function startApp() {
+        overlay.style.display = 'none';
+
+        // Başlangıçta kullanıcıya soruyoruz
+        speak("Kayıt ekranına hoş geldiniz. Formu adım adım sesle doldurmak ister misiniz? Evet veya Hayır deyin.", true);
+    }
+
+    // --- YARDIMCI: Rakam Çevirici ---
+    function textToNumbers(text) {
+        const map = {'bir':'1','iki':'2','üç':'3','dört':'4','beş':'5','altı':'6','yedi':'7','sekiz':'8','dokuz':'9','sıfır':'0','doksan':'90'};
+        return text.split(' ').map(w => map[w] || w).join(' ');
+    }
+
+    // --- SESLİ KONUŞMA (TTS) ---
+    function speak(text, autoListen = false) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'tr-TR'; u.rate = 0.9; u.volume = 1;
+
+        u.onend = function() {
+            if (autoListen) toggleMic(true);
+        };
+        window.speechSynthesis.speak(u);
+    }
+
+    // --- BİLDİRİM ---
+    function showNotification(message, isError = false) {
+        notification.textContent = message;
+        notification.className = 'notification show' + (isError ? ' error' : '');
+        setTimeout(() => notification.classList.remove('show'), 4000);
+    }
+
+    // --- MİKROFON YÖNETİMİ ---
+    function toggleMic(forceStart = false) {
+        if (!forceStart && isListening) {
+            isListening = false;
+            micButton.classList.remove('listening');
+            statusDiv.textContent = "Mikrofona basın";
+            speak("İptal edildi.");
+            return;
+        }
+
+        isListening = true;
+        micButton.classList.add('listening');
+        statusDiv.textContent = "Dinliyorum...";
+        showNotification("Dinliyorum...");
+
+        // Hangi alana yazılacağını belirginleştirmek için focus yap (eğer sıralı moddaysa)
+        if(isGuidedMode && currentStepIndex < steps.length) {
+            fields[steps[currentStepIndex].key].focus();
+        }
+
+        setTimeout(listen, 500);
+    }
+
+    // --- SIRALI MOD YÖNETİCİSİ ---
+    function nextStep() {
+        if (currentStepIndex < steps.length) {
+            let step = steps[currentStepIndex];
+            // Alanı odakla ve soruyu sor
+            fields[step.key].focus();
+            speak(step.question, true); // Soru bitince otomatik dinle
+        } else {
+            // Adımlar bitti
+            isGuidedMode = false;
+            speak("Tüm bilgiler alındı. Kaydı tamamlamak için 'Kaydı tamamla' deyin.", true);
+        }
+    }
+
+    // --- ANA DİNLEME MANTIĞI ---
+    async function listen() {
+        if (!isListening) return;
+
+        try {
+            const res = await fetch('/dinle', { method: 'POST' });
+            const data = await res.json();
+
+            if (data.status === 'success') {
+                let raw = data.command.toLowerCase().trim();
+                console.log("Duyulan:", raw);
+                showNotification(`Algılandı: "${raw}"`);
+
+                // -----------------------------------------------------
+                // ÖZEL DURUM: Henüz mod seçilmediyse (Başlangıç Sorusu)
+                // -----------------------------------------------------
+                if (!isGuidedMode && currentStepIndex === 0 && raw.length > 0 && fields['fullname'].value === '') {
+                    if (raw.includes('evet') || raw.includes('istiyorum')) {
+                        isGuidedMode = true;
+                        speak("Harika! Sırasıyla başlayalım.", false);
+                        setTimeout(nextStep, 2000); // 2 saniye sonra ilk soruyu sor
+                        return;
+                    } else if (raw.includes('hayır') || raw.includes('istemiyorum')) {
+                        speak("Tamam, istediğiniz alanı seçip konuşabilirsiniz.", false);
+                        isListening = false; micButton.classList.remove('listening');
+                        return;
+                    }
+                }
+
+                // -----------------------------------------------------
+                // SIRALI MOD (GUIDED MODE) AKTİFSE
+                // -----------------------------------------------------
+                if (isGuidedMode) {
+                    let step = steps[currentStepIndex];
+                    let valueToWrite = raw;
+
+                    // Veriyi temizle ve formatla
+                    if (step.key === 'email') {
+                        valueToWrite = raw.replace(/(email yaz|e-posta yaz)/g,'')
+                            .replace(/(nokta|dıt|dat)/g,'.').replace(/(et|at)/g,'@').replace(/\s+/g,'');
+                        const trMap = {'ğ':'g', 'ü':'u', 'ş':'s', 'ı':'i', 'ö':'o', 'ç':'c'};
+                        valueToWrite = valueToWrite.replace(/[ğüşıöç]/g, s => trMap[s]);
+                        if (!valueToWrite.includes('@')) {
+                            if (valueToWrite.includes('gmail')) valueToWrite = valueToWrite.replace('gmail', '@gmail');
+                            if (valueToWrite.includes('hotmail')) valueToWrite = valueToWrite.replace('hotmail', '@hotmail');
+                        }
+                    }
+                    else if (step.key === 'phone' || step.key === 'zipcode') {
+                        valueToWrite = textToNumbers(raw).replace(/\s+/g, '');
+                    }
+                    else if (step.key === 'password') {
+                        valueToWrite = textToNumbers(raw).replace(/\s+/g, '');
+                    }
+                    else if (step.key === 'fullname' || step.key === 'city' || step.key === 'street') {
+                        // İlk harfleri büyüt
+                        valueToWrite = raw.replace(/(isim yaz|şehir yaz|adres yaz)/g, '').trim();
+                        valueToWrite = valueToWrite.replace(/\b\w/g, l => l.toUpperCase());
+                    }
+
+                    // Değeri yaz
+                    fields[step.key].value = valueToWrite;
+
+                    // Onay ver ve bir sonrakine geç
+                    currentStepIndex++;
+                    setTimeout(nextStep, 1000);
+                    return;
+                }
+
+                // -----------------------------------------------------
+                // NORMAL MOD (KARIŞIK) - Mevcut Komut Yapısı
+                // -----------------------------------------------------
+
+                // 1. KAYDI TAMAMLA
+                if (raw.includes('kaydı tamamla') || raw.includes('kayıt ol')) {
+                    registerBtn.click();
+                    isListening = false; micButton.classList.remove('listening');
+                    return;
+                }
+                // 2. TEMİZLE
+                else if (raw.includes('sil') || raw.includes('temizle')) {
+                    for(let k in fields) fields[k].value = "";
+                    speak("Form temizlendi.");
+                }
+                // 3. SPESİFİK ALANLAR (İsim, Telefon vs.)
+                else if (raw.includes('isim')) {
+                    let val = raw.replace('isim','').trim().replace(/\b\w/g, l => l.toUpperCase());
+                    fields.fullname.value = val;
+                    speak("İsim yazıldı.");
+                }
+                else if (raw.includes('telefon')) {
+                    let val = textToNumbers(raw.replace('telefon','')).replace(/\s+/g,'');
+                    fields.phone.value = val;
+                    speak("Telefon yazıldı.");
+                }
+                // ... Diğer komutlar ... (Sıralı modda olmadığında kullanılabilir)
+                else {
+                    // Eğer hiçbir komut yoksa ve bir alana odaklanılmışsa, oraya yazmayı dene
+                    let activeEl = document.activeElement;
+                    if(activeEl && activeEl.tagName === 'INPUT') {
+                        activeEl.value = raw;
+                        speak("Yazıldı.");
+                    } else {
+                        speak("Anlaşılamadı.");
+                    }
+                }
+
+            } else {
+                speak("Ses gelmedi.", false);
+                isListening = false;
+                micButton.classList.remove('listening');
+                statusDiv.textContent = "Mikrofona basın";
+            }
+        } catch (e) {
+            console.error(e);
+            speak("Bir hata oluştu.");
+            isListening = false;
+            micButton.classList.remove('listening');
+        }
+    }
+
+    // --- KAYIT İŞLEMİ ---
+    registerBtn.addEventListener('click', async () => {
+        const data = {
+            full_name: fields.fullname.value,
+            email: fields.email.value,
+            phone: fields.phone.value,
+            city: fields.city.value,
+            zipcode: fields.zipcode.value,
+            street: fields.street.value,
+            password: fields.password.value
+        };
+
+        if (!data.email || !data.password || !data.full_name) {
+            speak("Lütfen zorunlu alanları doldurun.");
+            return;
+        }
+
+        speak("Kayıt yapılıyor, lütfen bekleyin.");
+
+        try {
+            const res = await fetch('/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+
+            if (result.status === 'success') {
+                speak("Kayıt başarılı! Giriş ekranına yönlendiriliyorsunuz.");
+                setTimeout(() => window.location.href = "/login", 2000);
+            } else {
+                speak("Hata: " + result.message);
+                showNotification(result.message, true);
+            }
+        } catch (e) {
+            speak("Sunucu hatası oluştu.");
+        }
+    });
+
+    // --- SPACE TUŞU ÇAKIŞMASI ÇÖZÜMÜ ---
+    micButton.addEventListener('click', () => toggleMic());
+
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' || e.key === ' ') {
+            // Eğer odak bir yazı kutusundaysa (Input/Textarea), Space boşluk bırakmalı.
+            // Bu durumda preventDefault YAPMA, bırak yazsın.
+            if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+                return;
+            }
+
+            // Eğer boşluktaysa (Inputta değilse), o zaman Mikrofonu tetikle
+            e.preventDefault(); // Sayfa kaymasını engelle
+
+            if (overlay.style.display !== 'none') {
+                startApp();
+            } else {
+                toggleMic();
+            }
+        }
+    });
+</script>
+</body>
+</html>

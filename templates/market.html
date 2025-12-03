@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EchoMarket - Alışveriş</title>
+    <style>
+        /* --- ERİŞİLEBİLİRLİK VE TASARIM --- */
+        body {
+            background-color: #000000;
+            color: #FFFF00;
+            font-family: 'Arial', sans-serif;
+            margin: 0; padding: 20px;
+            text-align: center;
+        }
+
+        /* Üst Bilgi */
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-bottom: 20px; border-bottom: 2px solid #333; margin-bottom: 30px;
+        }
+        h1 { font-size: 40px; margin: 0; }
+
+        /* MİKROFON (Sabit ve Büyük) */
+        .mic-container { margin: 30px 0; }
+        .mic-button {
+            width: 120px; height: 120px; border-radius: 50%;
+            background: #FFFF00; border: 6px solid #fff;
+            font-size: 50px; cursor: pointer; transition: all 0.3s;
+        }
+        .mic-button.listening { background: #00FF00; box-shadow: 0 0 40px #00FF00; transform: scale(1.1); }
+        #status { font-size: 24px; margin-top: 15px; color: #fff; }
+
+        /* ÜRÜN IZGARASI (GRID) */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Mobilde 1, PC'de yan yana */
+            gap: 30px;
+            padding: 20px;
+        }
+
+        /* ÜRÜN KARTI */
+        .product-card {
+            background: #1A1A1A;
+            border: 4px solid #FFFF00;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .product-card:hover, .product-card:focus {
+            transform: scale(1.05);
+            border-color: #00FFFF;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            outline: none; /* Focus olunca border rengi değişsin */
+        }
+
+        .product-img {
+            width: 100%; height: 250px; object-fit: contain;
+            background-color: #fff; border-radius: 10px; margin-bottom: 15px;
+        }
+
+        .product-name { font-size: 32px; font-weight: bold; margin-bottom: 10px; color: #fff; }
+        .product-price { font-size: 36px; color: #00FF00; font-weight: bold; }
+
+        /* BAŞLANGIÇ PERDESİ */
+        #start-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.98); z-index: 9999;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+        }
+        .start-msg { font-size: 48px; color: #00FF00; border: 5px solid #00FF00; padding: 40px; border-radius: 20px; }
+    </style>
+</head>
+<body>
+
+<!-- BAŞLANGIÇ EKRANI -->
+<div id="start-overlay" onclick="startApp()">
+    <div class="start-msg">MARKETİ BAŞLATMAK İÇİN<br>TIKLAYIN</div>
+</div>
+
+<header>
+    <h1>EchoMarket</h1>
+    <div style="font-size: 24px;">👤 Hesabım</div>
+</header>
+
+<div class="mic-container">
+    <button id="micButton" class="mic-button">🎤</button>
+    <div id="status">Mikrofona basın</div>
+</div>
+
+<!-- ÜRÜNLERİN GELECEĞİ YER -->
+<div id="productsContainer" class="products-grid">
+    <!-- Burası JavaScript ile dolacak -->
+    <div style="grid-column: 1/-1; font-size: 28px; color: #888;">
+        "Duş jeli", "Süt", "Ekmek" gibi bir ürün söyleyin...
+    </div>
+</div>
+
+<script>
+    const micButton = document.getElementById('micButton');
+    const statusDiv = document.getElementById('status');
+    const container = document.getElementById('productsContainer');
+    const overlay = document.getElementById('start-overlay');
+    let isListening = false;
+
+    function startApp() {
+        overlay.style.display = 'none';
+        speak("Echo Market'e hoş geldiniz. Bugün neler almak istersiniz? Lütfen ürün adını söyleyin.", true);
+    }
+
+    // --- TTS (KONUŞMA) ---
+    function speak(text, autoListen = false) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'tr-TR'; u.rate = 0.9; u.volume = 1;
+        u.onend = function() { if (autoListen) toggleMic(true); };
+        window.speechSynthesis.speak(u);
+    }
+
+    // --- MİKROFON ---
+    function toggleMic(forceStart = false) {
+        if (!forceStart && isListening) {
+            isListening = false; micButton.classList.remove('listening');
+            statusDiv.textContent = "Mikrofona basın";
+            speak("İptal edildi."); return;
+        }
+        isListening = true; micButton.classList.add('listening');
+        statusDiv.textContent = "Dinliyorum...";
+        setTimeout(listen, 500);
+    }
+
+    // --- DİNLEME VE ARAMA ---
+    async function listen() {
+        if (!isListening) return;
+        try {
+            // Python'daki '/dinle' endpointini kullanıyoruz (Ses -> Yazı)
+            const res = await fetch('/dinle', { method: 'POST' });
+            const data = await res.json();
+
+            if (data.status === 'success') {
+                let query = data.command.toLowerCase().trim();
+                statusDiv.textContent = "Aranıyor: " + query;
+
+                // Ürün Arama Fonksiyonunu Çağır
+                searchProducts(query);
+            } else {
+                speak("Ses gelmedi.", false);
+            }
+        } catch (e) { speak("Hata oluştu."); }
+
+        isListening = false; micButton.classList.remove('listening');
+    }
+
+    // --- ÜRÜN ARAMA VE GÖSTERME ---
+    async function searchProducts(query) {
+        speak(query + " aranıyor, lütfen bekleyin.");
+
+        try {
+            const res = await fetch('/search_products', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ query: query })
+            });
+            const result = await res.json();
+
+            if (result.status === 'success') {
+                displayProducts(result.products, query);
+            } else {
+                speak("Maalesef, " + query + " kategorisinde ürün bulamadım.");
+                container.innerHTML = `<div style="font-size:30px; color:red;">Ürün bulunamadı.</div>`;
+            }
+        } catch (e) {
+            console.error(e);
+            speak("Sunucu hatası.");
+        }
+    }
+
+    // --- ÜRÜNLERİ EKRAMA BASMA VE OKUMA ---
+    function displayProducts(products, categoryName) {
+        container.innerHTML = ""; // Ekranı temizle
+        let speechText = categoryName + " kategorisinde " + products.length + " ürün bulundu. ";
+
+        products.forEach((prod, index) => {
+            // HTML Kart Oluştur
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            // Erişilebilirlik için Tab Index ekle (Klavye ile gezilebilir olsun)
+            card.setAttribute('tabindex', '0');
+
+            card.innerHTML = `
+                <img src="${prod.image}" class="product-img" alt="${prod.name}">
+                <div class="product-name">${prod.name}</div>
+                <div class="product-price">${prod.price} TL</div>
+            `;
+            container.appendChild(card);
+
+            // Sesli metne ekle (Örn: "Birinci ürün Dove, fiyatı 89 lira.")
+            speechText += `${index + 1}. ürün: ${prod.name}, fiyatı ${Math.floor(prod.price)} lira. `;
+        });
+
+        speechText += " Satın almak istediğiniz ürünün ismini söyleyebilirsiniz.";
+
+        // Ürünleri sesli oku
+        speak(speechText, true); // Okuma bitince tekrar dinlemeye geç (Sipariş için)
+    }
+
+    // --- KLAVYE KONTROLÜ ---
+    micButton.addEventListener('click', () => toggleMic());
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') {
+            e.preventDefault();
+            if (overlay.style.display !== 'none') startApp();
+            else toggleMic();
+        }
+    });
+</script>
+
+</body>
+</html>
