@@ -1,0 +1,218 @@
+{% extends "layout.html" %}
+
+{% block styles %}
+<style>
+    /* Sepet Genel */
+    .cart-container { width: 100%; max-width: 900px; margin: 30px auto; padding: 0 20px; }
+    
+    /* Ürün Kartı */
+    .cart-item {
+        background: var(--card-bg);
+        border: 2px solid #444;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: 0.3s;
+    }
+    .cart-item:hover { border-color: var(--accent-color); }
+
+    .cart-img { width: 100px; height: 100px; object-fit: cover; border-radius: 10px; background: #fff; }
+    
+    .cart-info { flex: 1; text-align: left; }
+    .cart-title { font-size: 22px; font-weight: bold; color: var(--text-color); margin-bottom: 5px; }
+    .cart-price { color: #aaa; font-size: 18px; }
+
+    /* Adet Butonları (+/-) */
+    .qty-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #222;
+        padding: 5px 15px;
+        border-radius: 20px;
+        border: 1px solid #555;
+    }
+    .qty-btn {
+        background: var(--accent-color);
+        color: var(--bg-color);
+        border: none;
+        width: 35px; height: 35px;
+        border-radius: 50%;
+        font-size: 24px; font-weight: bold;
+        cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: 0.2s;
+        line-height: 0; /* Artı/Eksi işaretini ortalamak için */
+    }
+    .qty-btn:hover { transform: scale(1.1); background: #fff; }
+    .qty-text { font-size: 22px; font-weight: bold; color: #fff; min-width: 30px; text-align: center; }
+
+    /* Toplam Tutar */
+    .item-total { font-size: 22px; font-weight: bold; color: var(--accent-color); min-width: 100px; text-align: right; }
+
+    /* Alt Kısım */
+    .total-section { text-align: right; margin-top: 30px; border-top: 2px solid #555; padding-top: 20px; }
+    .total-price { font-size: 32px; color: var(--accent-color); font-weight: bold; }
+    
+    .checkout-btn {
+        background: var(--accent-color); color: var(--bg-color);
+        font-size: 24px; font-weight: bold; padding: 15px 50px;
+        border: none; border-radius: 10px; cursor: pointer; margin-top: 20px;
+        transition: 0.3s;
+    }
+    .checkout-btn:hover { background: #fff; transform: scale(1.05); }
+
+    /* Mikrofon */
+    .mic-area { text-align: center; margin-bottom: 30px; }
+    .mic-btn-small {
+        width: 70px; height: 70px; border-radius: 50%;
+        background: var(--accent-color); color: var(--bg-color);
+        font-size: 30px; border: 3px solid #fff; cursor: pointer;
+        display: flex; align-items: center; justify-content: center; margin: 0 auto;
+    }
+    .mic-btn-small.listening { background: #00FF00; animation: pulse 1.5s infinite; }
+    #voiceStatus { margin-top: 10px; font-size: 18px; color: #aaa; }
+    @keyframes pulse { 0% {box-shadow: 0 0 0 0 rgba(0,255,0,0.7);} 70% {box-shadow: 0 0 0 20px rgba(0,255,0,0);} }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cart-container">
+    <h1 style="text-align: center; color: var(--accent-color); margin-bottom: 20px;">Sepetim</h1>
+
+    <div class="mic-area">
+        <div id="micButton" class="mic-btn-small"><i class="fas fa-microphone"></i></div>
+        <div id="voiceStatus">"Siparişi onayla" veya "Market'e dön" diyebilirsiniz...</div>
+    </div>
+
+    {% if cart_items %}
+        {% for item in cart_items %}
+        <div class="cart-item">
+            <img src="{{ item[4] }}" class="cart-img" onerror="this.src='https://placehold.co/100?text=Urun'">
+            
+            <div class="cart-info">
+                <div class="cart-title">{{ item[0] }}</div>
+                <div class="cart-price">Birim: {{ item[1] }} TL</div>
+            </div>
+
+            <div class="qty-controls">
+                <button class="qty-btn" onclick="updateCartItem({{ item[5] }}, 'decrease')">-</button>
+                <span class="qty-text">{{ item[2] }}</span>
+                <button class="qty-btn" onclick="updateCartItem({{ item[5] }}, 'increase')">+</button>
+            </div>
+
+            <div class="item-total">
+                {{ item[3] }} TL
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="total-section">
+            <div style="font-size: 20px; color: #aaa;">Toplam Tutar</div>
+            <div class="total-price">{{ total_amount }} TL</div>
+            <button class="checkout-btn" onclick="checkout()">Siparişi Onayla</button>
+        </div>
+
+    {% else %}
+        <div style="text-align: center; padding: 50px;">
+            <h2>Sepetiniz boş.</h2>
+            <a href="/market" class="checkout-btn" style="text-decoration: none; display: inline-block; margin-top: 20px;">Alışverişe Başla</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // --- ADET GÜNCELLEME (ARTIK ÇALIŞACAK) ---
+    async function updateCartItem(productId, action) {
+        try {
+            const res = await fetch('/update_cart', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ product_id: productId, action: action })
+            });
+            const data = await res.json();
+            
+            if (data.status === 'success') {
+                // Sayfayı yenileyerek güncel fiyatları göster
+                location.reload();
+            } else {
+                console.error("Hata:", data.message);
+            }
+        } catch (e) { console.error("Bağlantı hatası:", e); }
+    }
+
+    // --- SİPARİŞ ONAY ---
+    function checkout() {
+        speak("Siparişiniz alındı! Teşekkür ederiz.");
+        setTimeout(() => window.location.href = "/", 3000);
+    }
+
+    // --- SESLİ KOMUT ---
+    const micBtn = document.getElementById('micButton');
+    const statusTxt = document.getElementById('voiceStatus');
+    let isListening = false;
+
+    function speak(text) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'tr-TR';
+        window.speechSynthesis.speak(u);
+    }
+
+    function toggleMic() {
+        if(isListening) return;
+        isListening = true;
+        micBtn.classList.add('listening');
+        statusTxt.textContent = "Dinliyorum...";
+
+        fetch('/dinle', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                isListening = false;
+                micBtn.classList.remove('listening');
+                
+                if (data.status === 'success') {
+                    const cmd = data.command.toLowerCase();
+                    statusTxt.textContent = "Algılandı: " + cmd;
+
+                    if (cmd.includes('onayla') || cmd.includes('tamamla')) {
+                        checkout();
+                    } 
+                    else if (cmd.includes('market') || cmd.includes('dön')) {
+                        window.location.href = "/market";
+                    }
+                    else if (cmd.includes('ana sayfa')) {
+                        window.location.href = "/";
+                    }
+                    else {
+                        speak("Anlaşılmadı. 'Onayla' veya 'Market' diyebilirsiniz.");
+                    }
+                } else {
+                    statusTxt.textContent = "Tekrar deneyin...";
+                }
+            })
+            .catch(e => {
+                isListening = false;
+                micBtn.classList.remove('listening');
+            });
+    }
+
+    if(micBtn) micBtn.addEventListener('click', toggleMic);
+
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') { e.preventDefault(); toggleMic(); }
+    });
+
+    window.onload = function() {
+        {% if cart_items %}
+            speak("Sepetinizde {{ cart_items|length }} ürün var. Toplam {{ total_amount }} lira.");
+        {% endif %}
+    };
+</script>
+{% endblock %}

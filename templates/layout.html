@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EchoMarket</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- GENEL TEMA AYARLARI --- */
+        :root {
+            /* Varsayılan (Dark Mode) */
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --accent-color: #ffff00; /* Sarı */
+            --input-bg: #333;
+            --card-bg: #1a1a1a;
+            --border-color: #444;
+        }
+
+        /* Light Mode Ayarları */
+        body.light-mode {
+            --bg-color: #f0f0f0;
+            --text-color: #1a1a1a;
+            --accent-color: #0056b3; /* Mavi */
+            --input-bg: #ffffff;
+            --card-bg: #ffffff;
+            --border-color: #ccc;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header (Her sayfada görünecek) */
+        .header {
+            width: 100%;
+            padding: 20px 30px; /* Kenar boşlukları biraz artırıldı */
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        /* Sağ üstteki buton grubu */
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+            gap: 20px; /* Butonlar arasındaki boşluk */
+        }
+
+        /* Tema Butonu */
+        .theme-toggle-btn {
+            background: none;
+            border: 2px solid var(--text-color);
+            color: var(--text-color);
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .theme-toggle-btn:hover {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        /* Hesabım Linki - YENİ EKLENEN */
+        .btn-account {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        .btn-account:hover {
+            color: var(--accent-color); /* Üzerine gelince tema rengini alır */
+        }
+
+        /* Sayfa İçeriği Alanı */
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding-top: 20px;
+        }
+    </style>
+    
+    {% block styles %}{% endblock %}
+</head>
+<body>
+
+    <div class="header">
+        <a href="/" class="logo">EchoMarket</a>
+        
+        <div class="nav-buttons">
+            <button class="theme-toggle-btn" onclick="toggleTheme()">
+                <i class="fas fa-adjust"></i> Tema
+            </button>
+
+            <a href="/account" class="btn-account">
+                <i class="fas fa-user"></i> Hesabım
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script>
+        // --- TEMA MANTIĞI (Her sayfada çalışır) ---
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        }
+
+        // Sayfa yüklenince temayı hatırla
+        window.onload = function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+            }
+        }
+    </script>
+    
+    {% block scripts %}{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,138 @@
+{% extends "layout.html" %}
+
+{% block styles %}
+<style>
+    .account-container { max-width: 800px; margin: 30px auto; padding: 0 20px; }
+    
+    /* Form Kartı */
+    .form-card {
+        background: var(--card-bg);
+        border: 2px solid #444;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; color: var(--text-color); margin-bottom: 8px; font-weight: bold; }
+    .form-input {
+        width: 100%; padding: 12px; background: #222; border: 1px solid #555;
+        color: white; border-radius: 8px; font-size: 16px; box-sizing: border-box;
+    }
+    .form-input:focus { border-color: var(--accent-color); outline: none; }
+    
+    /* Güncelle Butonu */
+    .update-btn {
+        width: 100%; padding: 15px; background: var(--accent-color);
+        color: var(--bg-color); border: none; border-radius: 8px;
+        font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s;
+    }
+    .update-btn:hover { background: #fff; }
+
+    /* Mesaj Kutusu */
+    .alert-box {
+        padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; text-align: center;
+    }
+    .alert-success { background: #155724; color: #d4edda; border: 1px solid #c3e6cb; }
+    .alert-error { background: #721c24; color: #f8d7da; border: 1px solid #f5c6cb; }
+
+    /* Sipariş Listesi */
+    .order-list { list-style: none; padding: 0; }
+    .order-item {
+        border-bottom: 1px solid #444; padding: 15px 0;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="account-container">
+    <h1 style="color: var(--accent-color); text-align: center; margin-bottom: 30px;">Hesabım</h1>
+
+    {% if msg %}
+        <div class="alert-box {% if msg_type == 'error' %}alert-error{% else %}alert-success{% endif %}">
+            {{ msg }}
+        </div>
+    {% endif %}
+
+    <div class="form-card">
+        <h2 style="border-bottom: 1px solid #555; padding-bottom: 15px; margin-bottom: 20px;">Bilgilerimi Güncelle</h2>
+        <form action="/account" method="POST">
+            
+            <div class="form-group">
+                <label class="form-label">Ad Soyad:</label>
+                <input type="text" name="name" value="{{ user[0] }}" class="form-input" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">E-posta (Değiştirebilirsiniz):</label>
+                <input type="email" name="email" value="{{ user[1] }}" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Yeni Şifre (Değiştirmek istemiyorsanız boş bırakın):</label>
+                <input type="password" name="new_password" class="form-input" placeholder="******">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Telefon:</label>
+                <input type="text" name="phone" value="{{ user[2] }}" class="form-input">
+            </div>
+
+            <h3 style="color: var(--accent-color); margin-top: 30px;">Adres Bilgileri</h3>
+            <div class="form-group">
+                <label class="form-label">Şehir:</label>
+                <input type="text" name="city" value="{{ address[1] }}" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Posta Kodu:</label>
+                <input type="text" name="zipcode" value="{{ address[2] }}" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Açık Adres:</label>
+                <textarea name="street" rows="3" class="form-input">{{ address[0] }}</textarea>
+            </div>
+            
+            <button type="submit" class="update-btn">BİLGİLERİ GÜNCELLE</button>
+        </form>
+    </div>
+
+    <div class="form-card">
+        <h2 style="border-bottom: 1px solid #555; padding-bottom: 15px;">Geçmiş Siparişlerim</h2>
+        {% if orders %}
+            <ul class="order-list">
+                {% for order in orders %}
+                <li class="order-item">
+                    <div>
+                        <strong style="color: var(--accent-color);">#{{ order[0] }}</strong> 
+                        <span style="color: #aaa; font-size: 14px; margin-left: 10px;">{{ order[2] }}</span>
+                        <div style="font-size: 14px; margin-top: 5px;">{{ order[3] }}</div>
+                    </div>
+                    <div style="font-size: 20px; font-weight: bold;">{{ order[1] }} TL</div>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p style="text-align: center; color: #aaa; margin-top: 20px;">Henüz siparişiniz bulunmuyor.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Sayfa açıldığında sesli asistan devreye girer
+    window.onload = function() {
+        {% if msg %}
+            // Eğer güncelleme mesajı varsa onu oku
+            const msg = new SpeechSynthesisUtterance("{{ msg }}");
+            msg.lang = 'tr-TR';
+            window.speechSynthesis.speak(msg);
+        {% else %}
+            // Yoksa standart karşılama
+            const msg = new SpeechSynthesisUtterance("Hesabım sayfasındasınız. E-posta veya şifrenizi buradan güncelleyebilirsiniz.");
+            msg.lang = 'tr-TR';
+            window.speechSynthesis.speak(msg);
+        {% endif %}
+    };
+</script>
+{% endblock %}
