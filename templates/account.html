@@ -7,7 +7,7 @@
     /* Form Kartı */
     .form-card {
         background: var(--card-bg);
-        border: 2px solid var(--border-color); /* DÜZELTME: Değişken kullanıldı */
+        border: 2px solid var(--border-color);
         border-radius: 15px;
         padding: 30px;
         margin-bottom: 30px;
@@ -18,49 +18,73 @@
     .form-input {
         width: 100%;
         padding: 12px;
-        background: var(--input-bg); /* DÜZELTME: Tema değişkeni */
-        border: 1px solid var(--border-color); /* DÜZELTME: Tema değişkeni */
-        color: var(--text-color); /* DÜZELTME: Tema rengi */
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
         border-radius: 8px;
         font-size: 16px;
         box-sizing: border-box;
     }
-    .form-input:focus { border-color: var(--accent-color); outline: none; }
+    .form-input:focus { border-color: var(--accent-color); outline: none; box-shadow: 0 0 10px var(--accent-color); }
 
     /* Güncelle Butonu */
     .update-btn {
         width: 100%; padding: 15px; background: var(--accent-color);
-        color: var(--bg-color); /* Metin rengi arka planla zıt olmalı */
+        color: var(--bg-color);
         border: none; border-radius: 8px;
         font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s;
-        border: 2px solid var(--accent-color); /* Kenarlık eklendi */
+        border: 2px solid var(--accent-color);
     }
     .update-btn:hover {
         background: transparent;
-        color: var(--text-color); /* Hover'da tema rengine dön */
+        color: var(--text-color);
     }
 
     /* Mesaj Kutusu */
     .alert-box {
         padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; text-align: center;
     }
-    /* Alert renkleri sabit kalabilir veya onlar için de root değişkeni tanımlanabilir */
     .alert-success { background: #155724; color: #d4edda; border: 1px solid #c3e6cb; }
     .alert-error { background: #721c24; color: #f8d7da; border: 1px solid #f5c6cb; }
 
     /* Sipariş Listesi */
     .order-list { list-style: none; padding: 0; }
     .order-item {
-        border-bottom: 1px solid var(--border-color); /* DÜZELTME */
+        border-bottom: 1px solid var(--border-color);
         padding: 15px 0;
         display: flex; justify-content: space-between; align-items: center;
+    }
+
+    /* MİKROFON BUTONU */
+    .mic-area { text-align: center; margin-bottom: 30px; }
+    .mic-btn-small {
+        width: 80px; height: 80px; border-radius: 50%;
+        background: var(--accent-color); color: var(--bg-color);
+        font-size: 35px; border: 4px solid #fff; cursor: pointer;
+        display: flex; align-items: center; justify-content: center; margin: 0 auto;
+        transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+    .mic-btn-small:hover { transform: scale(1.1); }
+    .mic-btn-small.listening { background: #00FF00; animation: pulse 1.5s infinite; }
+    #voiceStatus { margin-top: 15px; font-size: 20px; color: #aaa; font-weight: bold; }
+
+    @keyframes pulse {
+        0% {box-shadow: 0 0 0 0 rgba(0,255,0,0.7);}
+        70% {box-shadow: 0 0 0 20px rgba(0,255,0,0);}
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="account-container">
-    <h1 style="color: var(--accent-color); text-align: center; margin-bottom: 30px;">Hesabım</h1>
+    <h1 style="color: var(--accent-color); text-align: center; margin-bottom: 20px;">Hesabım</h1>
+
+    <div class="mic-area">
+        <div id="micButton" class="mic-btn-small"><i class="fas fa-microphone"></i></div>
+        <div id="voiceStatus">
+            "Şifremi değiştirmek istiyorum", "Adımı Ahmet yap" veya "Güncelle" diyebilirsiniz...
+        </div>
+    </div>
 
     {% if msg %}
     <div class="alert-box {% if msg_type == 'error' %}alert-error{% else %}alert-success{% endif %}">
@@ -70,43 +94,43 @@
 
     <div class="form-card">
         <h2 style="border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px;">Bilgilerimi Güncelle</h2>
-        <form action="/account" method="POST">
+        <form action="/account" method="POST" id="profileForm">
 
             <div class="form-group">
                 <label class="form-label">Ad Soyad:</label>
-                <input type="text" name="name" value="{{ user[0] }}" class="form-input" required>
+                <input type="text" name="name" id="inpName" value="{{ user[0] }}" class="form-input" required>
             </div>
 
             <div class="form-group">
                 <label class="form-label">E-posta (Değiştirebilirsiniz):</label>
-                <input type="email" name="email" value="{{ user[1] }}" class="form-input" required>
+                <input type="email" name="email" id="inpEmail" value="{{ user[1] }}" class="form-input" required>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Yeni Şifre (Değiştirmek istemiyorsanız boş bırakın):</label>
-                <input type="password" name="new_password" class="form-input" placeholder="******">
+                <input type="password" name="new_password" id="inpPassword" class="form-input" placeholder="******">
             </div>
 
             <div class="form-group">
                 <label class="form-label">Telefon:</label>
-                <input type="text" name="phone" value="{{ user[2] }}" class="form-input">
+                <input type="text" name="phone" id="inpPhone" value="{{ user[2] }}" class="form-input">
             </div>
 
             <h3 style="color: var(--accent-color); margin-top: 30px;">Adres Bilgileri</h3>
             <div class="form-group">
                 <label class="form-label">Şehir:</label>
-                <input type="text" name="city" value="{{ address[1] }}" class="form-input">
+                <input type="text" name="city" id="inpCity" value="{{ address[1] }}" class="form-input">
             </div>
             <div class="form-group">
                 <label class="form-label">Posta Kodu:</label>
-                <input type="text" name="zipcode" value="{{ address[2] }}" class="form-input">
+                <input type="text" name="zipcode" id="inpZip" value="{{ address[2] }}" class="form-input">
             </div>
             <div class="form-group">
                 <label class="form-label">Açık Adres:</label>
-                <textarea name="street" rows="3" class="form-input">{{ address[0] }}</textarea>
+                <textarea name="street" id="inpAddress" rows="3" class="form-input">{{ address[0] }}</textarea>
             </div>
 
-            <button type="submit" class="update-btn">BİLGİLERİ GÜNCELLE</button>
+            <button type="submit" id="btnSubmit" class="update-btn">BİLGİLERİ GÜNCELLE</button>
         </form>
     </div>
 
@@ -134,24 +158,198 @@
 
 {% block scripts %}
 <script>
+    // --- GİRİŞ ALANLARI REFERANSLARI ---
+    const inputs = {
+        name: document.getElementById('inpName'),
+        email: document.getElementById('inpEmail'),
+        password: document.getElementById('inpPassword'),
+        phone: document.getElementById('inpPhone'),
+        city: document.getElementById('inpCity'),
+        zipcode: document.getElementById('inpZip'),
+        address: document.getElementById('inpAddress'),
+        submit: document.getElementById('btnSubmit')
+    };
+
+    const micBtn = document.getElementById('micButton');
+    const statusTxt = document.getElementById('voiceStatus');
+    let isListening = false;
+
+    function speak(text) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'tr-TR';
+        window.speechSynthesis.speak(u);
+    }
+
+    // --- SESLİ KOMUT İŞLEYİCİ ---
+    function toggleMic() {
+        if(isListening) return;
+        isListening = true;
+        micBtn.classList.add('listening');
+        statusTxt.textContent = "Dinliyorum...";
+
+        fetch('/dinle', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                isListening = false;
+                micBtn.classList.remove('listening');
+
+                if (data.status !== 'success') {
+                    speak("Ses anlaşılamadı.");
+                    statusTxt.textContent = "Anlaşılamadı.";
+                    return;
+                }
+
+                let cmd = (data.command || "").toLowerCase().trim();
+                statusTxt.textContent = "Algılandı: " + cmd;
+
+                // 1. GENEL NAVİGASYON
+                if (cmd.includes('market') || cmd.includes('dön')) {
+                    speak("Markete dönülüyor."); setTimeout(() => window.location.href = "/market", 1500); return;
+                }
+                if (cmd.includes('sepet')) {
+                    speak("Sepete gidiliyor."); setTimeout(() => window.location.href = "/cart", 1500); return;
+                }
+                if (cmd.includes('ana sayfa')) {
+                    speak("Ana sayfaya gidiliyor."); setTimeout(() => window.location.href = "/", 1500); return;
+                }
+                if (cmd.includes('çıkış')) {
+                    speak("Çıkış yapılıyor."); setTimeout(() => window.location.href = "/", 1500); return;
+                }
+
+                // 2. FORM İŞLEMLERİ (GÜNCELLEME)
+                if (cmd.includes('güncelle') || cmd.includes('kaydet')) {
+                    speak("Bilgileriniz güncelleniyor.");
+                    inputs.submit.click();
+                    return;
+                }
+
+                // 3. ALAN DOLDURMA MANTIĞI
+                let filled = false;
+
+                // --- İSİM / AD ---
+                if (cmd.includes('isim') || cmd.includes('ad')) {
+                    // "İsmim Ahmet Yılmaz" -> "Ahmet Yılmaz" kısmını al
+                    let val = cmd.replace('ismim', '').replace('adım', '').replace('soyadım', '').replace('yap', '').replace('olsun', '').trim();
+                    if(val.length > 1) {
+                        inputs.name.value = toTitleCase(val);
+                        speak("İsim değiştirildi: " + val);
+                    } else {
+                        inputs.name.focus();
+                        speak("İsim alanına odaklandım.");
+                    }
+                    filled = true;
+                }
+
+                // --- E-POSTA / MAİL ---
+                else if (cmd.includes('mail') || cmd.includes('posta')) {
+                    if (cmd.includes('değiştir') || cmd.includes('istiyorum')) {
+                        inputs.email.focus();
+                        speak("E-posta alanına odaklandım. Lütfen yeni adresi yazın.");
+                    } else {
+                        // Basit e-posta çevirisi
+                        let val = cmd.replace('mail', '').replace('adresim', '').replace('posta', '').replace('yap', '').replace('olsun', '').trim();
+                        val = val.replace(' at ', '@').replace(' et ', '@').replace(' nokta ', '.').replace(/\s+/g, ''); // Boşlukları sil
+
+                        // Türkçe karakter düzeltmesi
+                        const trMap = {'ğ':'g', 'ü':'u', 'ş':'s', 'ı':'i', 'ö':'o', 'ç':'c'};
+                        val = val.replace(/[ğüşıöç]/g, s => trMap[s]);
+
+                        if(val.length > 5) {
+                            inputs.email.value = val.toLowerCase();
+                            speak("E-posta yazıldı: " + val);
+                        } else {
+                            inputs.email.focus();
+                            speak("E-posta alanına odaklandım.");
+                        }
+                    }
+                    filled = true;
+                }
+
+                // --- ŞİFRE ---
+                else if (cmd.includes('şifre') || cmd.includes('parola')) {
+                    // Şifreyi sesli söylemek güvenlik riski olabilir ama kullanıcı isterse "Şifre 1 2 3 4" diyebilir.
+                    let val = cmd.replace('şifre', '').replace('parola', '').replace('yap', '').replace('olsun', '').replace('değiştir', '').trim();
+
+                    // Rakamları texte çevirme fonksiyonunu kullanabilirsin (register'daki gibi) ama şimdilik direkt odaklanalım
+                    if (cmd.includes('değiştir') || cmd.includes('istiyorum') || val.length < 2) {
+                        inputs.password.focus();
+                        speak("Şifre alanına odaklandım. Lütfen yeni şifrenizi yazın.");
+                    } else {
+                        // Eğer kullanıcı "Şifre 1234" dediyse
+                        inputs.password.value = val.replace(/\s/g, ''); // Boşlukları sil
+                        speak("Şifre alanına yazıldı.");
+                    }
+                    filled = true;
+                }
+
+                // --- TELEFON ---
+                else if (cmd.includes('telefon')) {
+                    let val = cmd.replace(/\D/g, ''); // Sadece rakamları al
+                    if(val.length > 5) {
+                        inputs.phone.value = val;
+                        speak("Telefon numarası yazıldı.");
+                    } else {
+                        inputs.phone.focus();
+                        speak("Telefon alanına odaklandım.");
+                    }
+                    filled = true;
+                }
+
+                // --- ŞEHİR / ADRES ---
+                else if (cmd.includes('şehir') || cmd.includes('il')) {
+                    let val = cmd.replace('şehir', '').replace('yaşıyorum', '').replace('il', '').trim();
+                    inputs.city.value = toTitleCase(val);
+                    speak("Şehir yazıldı.");
+                    filled = true;
+                }
+                else if (cmd.includes('adres')) {
+                    inputs.address.focus();
+                    speak("Adres alanına odaklandım. Detayları söyleyebilirsiniz.");
+                    filled = true;
+                }
+
+                if (!filled && !cmd.includes('güncelle')) {
+                    speak("Anlaşılamadı. İsim, e-posta, şifre, telefon veya adres diyerek alan seçebilirsiniz.");
+                }
+
+            })
+            .catch(err => {
+                console.error(err);
+                isListening = false;
+                micBtn.classList.remove('listening');
+                speak("Hata oluştu.");
+            });
+    }
+
+    // Yardımcı: Baş harfleri büyüt
+    function toTitleCase(str) {
+        return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+    }
+
+    if(micBtn) micBtn.addEventListener('click', toggleMic);
+
+    // Space Tuşu
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') {
+            if(document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+                return;
+            }
+            e.preventDefault();
+            toggleMic();
+        }
+    });
+
     document.addEventListener("DOMContentLoaded", function() {
-        // ÇÖZÜM: if/else bloğunu Jinja'nın süslü parantezleri içine alıyoruz.
-        // Böylece IntelliJ bunu sadece bir "string ataması" olarak görüyor ve hata vermiyor.
-
-        // Python mantığı: Eğer msg varsa msg'yi yaz, yoksa boş string ('') yaz.
         const backendMsg = "{{ msg if msg else '' }}";
-
         let textToRead = "";
 
         if (backendMsg && backendMsg.trim() !== "") {
-            // Backend'den mesaj geldiyse onu kullan
             textToRead = backendMsg;
         } else {
-            // Mesaj yoksa varsayılan metni kullan
-            textToRead = "Hesabım sayfasındasınız. E-posta veya şifrenizi buradan güncelleyebilirsiniz.";
+            textToRead = "Hesabım sayfasındasınız. Bilgilerinizi güncellemek için mikrofonu kullanabilirsiniz.";
         }
 
-        // Okuma işlemini başlat
         if (textToRead) {
             const utterance = new SpeechSynthesisUtterance(textToRead);
             utterance.lang = 'tr-TR';

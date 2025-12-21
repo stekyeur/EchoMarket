@@ -1,0 +1,161 @@
+{% extends "layout.html" %}
+
+{% block styles %}
+<style>
+    .success-container { max-width: 800px; margin: 40px auto; text-align: center; padding: 20px; }
+    .success-icon { font-size: 80px; color: #00FF00; margin-bottom: 20px; animation: pop 0.5s; }
+    .order-title { font-size: 36px; color: var(--accent-color); margin-bottom: 10px; }
+    .order-info { font-size: 24px; color: var(--text-color); margin-bottom: 40px; }
+
+    .items-list { list-style: none; padding: 0; text-align: left; margin-top: 30px; }
+    .item-row {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 15px; border-bottom: 1px solid var(--border-color);
+        background: var(--card-bg); margin-bottom: 10px; border-radius: 10px;
+    }
+    .item-name { font-size: 20px; font-weight: bold; color: var(--text-color); }
+    .item-qty { color: var(--accent-color); font-weight: bold; }
+
+    .home-btn {
+        display: inline-block; margin-top: 30px; padding: 20px 40px;
+        background: var(--accent-color); color: var(--bg-color);
+        font-size: 24px; font-weight: bold; text-decoration: none; border-radius: 15px;
+    }
+
+    /* MİKROFON BUTONU STİLLERİ */
+    .mic-area { margin-top: 40px; }
+    .mic-btn-small {
+        width: 80px; height: 80px; border-radius: 50%;
+        background: var(--accent-color); color: var(--bg-color);
+        font-size: 35px; border: 4px solid #fff; cursor: pointer;
+        display: flex; align-items: center; justify-content: center; margin: 0 auto;
+        transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+    .mic-btn-small:hover { transform: scale(1.1); }
+    .mic-btn-small.listening { background: #00FF00; animation: pulse 1.5s infinite; }
+    #voiceStatus { margin-top: 15px; font-size: 20px; color: #aaa; font-weight: bold; }
+
+    @keyframes pop { 0% { transform: scale(0); } 80% { transform: scale(1.1); } 100% { transform: scale(1); } }
+    @keyframes pulse { 0% {box-shadow: 0 0 0 0 rgba(0,255,0,0.7);} 70% {box-shadow: 0 0 0 20px rgba(0,255,0,0);} }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="success-container">
+    <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+    <div class="order-title">Siparişiniz Alındı!</div>
+    <div class="order-info">
+        Sipariş No: #{{ order[0] }}<br>
+        Toplam Tutar: {{ order[1] }} TL<br>
+        Durum: {{ order[3] }}
+    </div>
+
+    <div class="mic-area">
+        <div id="micButton" class="mic-btn-small"><i class="fas fa-microphone"></i></div>
+        <div id="voiceStatus">
+            "Markete dön" veya "Ana sayfaya git" diyebilirsiniz...
+        </div>
+    </div>
+
+    <h3 style="text-align: left; color: var(--text-color); margin-top: 40px;">Aldığınız Ürünler:</h3>
+    <ul class="items-list">
+        {% for item in items %}
+        <li class="item-row">
+            <div>
+                <div class="item-name">{{ item[0] }}</div>
+                <div style="font-size: 16px; color: #888;">Birim: {{ item[2] }} TL</div>
+            </div>
+            <div class="item-qty">x{{ item[1] }}</div>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <a href="/market" class="home-btn">Alışverişe Devam Et</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const micBtn = document.getElementById('micButton');
+    const statusTxt = document.getElementById('voiceStatus');
+    let isListening = false;
+
+    function speak(text) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'tr-TR';
+        window.speechSynthesis.speak(u);
+    }
+
+    // --- SESLİ KOMUT İŞLEYİCİ ---
+    function toggleMic() {
+        if(isListening) return;
+        isListening = true;
+        micBtn.classList.add('listening');
+        statusTxt.textContent = "Dinliyorum...";
+
+        fetch('/dinle', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                isListening = false;
+                micBtn.classList.remove('listening');
+
+                if (data.status !== 'success') {
+                    speak("Ses anlaşılamadı.");
+                    statusTxt.textContent = "Anlaşılamadı.";
+                    return;
+                }
+
+                let cmd = (data.command || "").toLowerCase();
+                statusTxt.textContent = "Algılandı: " + cmd;
+
+                // --- YÖNLENDİRMELER ---
+                if (cmd.includes('market') || cmd.includes('dön') || cmd.includes('alışveriş')) {
+                    speak("Markete dönülüyor.");
+                    setTimeout(() => window.location.href = "/market", 1500);
+                    return;
+                }
+
+                if (cmd.includes('ana sayfa') || cmd.includes('başlangıç')) {
+                    speak("Ana sayfaya gidiliyor.");
+                    setTimeout(() => window.location.href = "/", 1500);
+                    return;
+                }
+
+                if (cmd.includes('hesabım')) {
+                    speak("Hesabım sayfasına gidiliyor.");
+                    setTimeout(() => window.location.href = "/account", 1500);
+                    return;
+                }
+
+                // Komut anlaşılmazsa
+                if(data.message) speak(data.message);
+                else speak("Anlaşılamadı. Markete dön diyebilirsiniz.");
+            })
+            .catch(err => {
+                console.error(err);
+                isListening = false;
+                micBtn.classList.remove('listening');
+                speak("Bir hata oluştu.");
+            });
+    }
+
+    if(micBtn) micBtn.addEventListener('click', toggleMic);
+
+    // Space Tuşu ile Başlatma
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') {
+            e.preventDefault();
+            toggleMic();
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Sayfa açılış mesajı
+        const msg = "Siparişiniz başarıyla alındı. Toplam tutar {{ order[1] }} lira. Alışverişe devam etmek için markete dön diyebilirsiniz.";
+        const u = new SpeechSynthesisUtterance(msg);
+        u.lang = 'tr-TR';
+        window.speechSynthesis.speak(u);
+    });
+</script>
+{% endblock %}

@@ -141,9 +141,35 @@
         else alert("Hata: " + (data.message || "bilinmeyen hata"));
     }
 
-    function checkout() {
-        speak("Siparişiniz alındı! Teşekkür ederiz.");
-        setTimeout(() => window.location.href = "/", 3000);
+    // --- YENİ CHECKOUT FONKSİYONU ---
+    async function checkout() {
+        // Kullanıcıya bilgi ver
+        speak("Siparişiniz oluşturuluyor, lütfen bekleyin...");
+
+        try {
+            // Backend'deki /checkout rotasına istek at
+            const res = await fetch('/checkout', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'}
+            });
+
+            const data = await res.json();
+
+            if(data.status === 'success') {
+                // BAŞARILI: Sipariş başarı sayfasına yönlendir
+                window.location.href = "/order_success/" + data.order_id;
+            } else {
+                // HATA: Kullanıcıya hatayı söyle
+                speak("Bir hata oluştu: " + data.message);
+                // Eğer oturum düşmüşse login sayfasına at
+                if(data.message.includes("Giriş")) {
+                    window.location.href = "/login";
+                }
+            }
+        } catch(e) {
+            console.error(e);
+            speak("Bağlantı hatası oluştu.");
+        }
     }
 
     /* ========== VOICE SYSTEM ========== */

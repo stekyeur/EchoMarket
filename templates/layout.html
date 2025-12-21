@@ -116,8 +116,12 @@
     <a href="/" class="logo">EchoMarket</a>
 
     <div class="nav-buttons">
+        <a href="/cart" class="btn-account" style="margin-right: 10px;">
+            <i class="fas fa-shopping-cart"></i> Sepetim ({{ cart_count if cart_count else 0 }})
+        </a>
+
         <button class="theme-toggle-btn" id="themeToggle">
-            <i class="fas fa-moon"></i> Karanlık
+            <i class="fas fa-adjust"></i> Tema
         </button>
 
         <a href="/account" class="btn-account">
