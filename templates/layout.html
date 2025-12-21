@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EchoMarket</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         /* --- GENEL TEMA AYARLARI --- */
         :root {
@@ -22,7 +22,7 @@
         body.light-mode {
             --bg-color: #f0f0f0;
             --text-color: #1a1a1a;
-            --accent-color: #0056b3; /* Mavi */
+            --accent-color: #0056b3; /* Koyu Mavi - Kontrast için */
             --input-bg: #ffffff;
             --card-bg: #ffffff;
             --border-color: #ccc;
@@ -39,10 +39,10 @@
             min-height: 100vh;
         }
 
-        /* Header (Her sayfada görünecek) */
+        /* Header */
         .header {
             width: 100%;
-            padding: 20px 30px; /* Kenar boşlukları biraz artırıldı */
+            padding: 20px 30px;
             box-sizing: border-box;
             display: flex;
             justify-content: space-between;
@@ -58,11 +58,10 @@
             text-decoration: none;
         }
 
-        /* Sağ üstteki buton grubu */
         .nav-buttons {
             display: flex;
             align-items: center;
-            gap: 20px; /* Butonlar arasındaki boşluk */
+            gap: 20px;
         }
 
         /* Tema Butonu */
@@ -84,7 +83,6 @@
             color: var(--bg-color);
         }
 
-        /* Hesabım Linki - YENİ EKLENEN */
         .btn-account {
             color: var(--text-color);
             text-decoration: none;
@@ -97,10 +95,9 @@
         }
 
         .btn-account:hover {
-            color: var(--accent-color); /* Üzerine gelince tema rengini alır */
+            color: var(--accent-color);
         }
 
-        /* Sayfa İçeriği Alanı */
         .container {
             flex: 1;
             display: flex;
@@ -110,48 +107,33 @@
             padding-top: 20px;
         }
     </style>
-    
+
     {% block styles %}{% endblock %}
 </head>
 <body>
 
-    <div class="header">
-        <a href="/" class="logo">EchoMarket</a>
-        
-        <div class="nav-buttons">
-            <button class="theme-toggle-btn" onclick="toggleTheme()">
-                <i class="fas fa-adjust"></i> Tema
-            </button>
+<div class="header">
+    <a href="/" class="logo">EchoMarket</a>
 
-            <a href="/account" class="btn-account">
-                <i class="fas fa-user"></i> Hesabım
-            </a>
-        </div>
+    <div class="nav-buttons">
+        <button class="theme-toggle-btn" id="themeToggle">
+            <i class="fas fa-moon"></i> Karanlık
+        </button>
+
+        <a href="/account" class="btn-account">
+            <i class="fas fa-user"></i> Hesabım
+        </a>
     </div>
+</div>
 
-    <div class="container">
-        {% block content %}
-        {% endblock %}
-    </div>
+<div class="container">
+    {% block content %}
+    {% endblock %}
+</div>
 
-    <script>
-        // --- TEMA MANTIĞI (Her sayfada çalışır) ---
-        function toggleTheme() {
-            document.body.classList.toggle('light-mode');
-            const isLight = document.body.classList.contains('light-mode');
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-        }
+<script src="{{ url_for('static', filename='theme.js') }}"></script>
 
-        // Sayfa yüklenince temayı hatırla
-        window.onload = function() {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'light') {
-                document.body.classList.add('light-mode');
-            }
-        }
-    </script>
-    
-    {% block scripts %}{% endblock %}
+{% block scripts %}{% endblock %}
 
 </body>
 </html>

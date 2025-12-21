@@ -2,10 +2,8 @@
 
 {% block styles %}
 <style>
-    /* Sepet Genel */
     .cart-container { width: 100%; max-width: 900px; margin: 30px auto; padding: 0 20px; }
-    
-    /* Ürün Kartı */
+
     .cart-item {
         background: var(--card-bg);
         border: 2px solid #444;
@@ -20,12 +18,11 @@
     .cart-item:hover { border-color: var(--accent-color); }
 
     .cart-img { width: 100px; height: 100px; object-fit: cover; border-radius: 10px; background: #fff; }
-    
+
     .cart-info { flex: 1; text-align: left; }
     .cart-title { font-size: 22px; font-weight: bold; color: var(--text-color); margin-bottom: 5px; }
     .cart-price { color: #aaa; font-size: 18px; }
 
-    /* Adet Butonları (+/-) */
     .qty-controls {
         display: flex;
         align-items: center;
@@ -35,6 +32,7 @@
         border-radius: 20px;
         border: 1px solid #555;
     }
+
     .qty-btn {
         background: var(--accent-color);
         color: var(--bg-color);
@@ -45,18 +43,16 @@
         cursor: pointer;
         display: flex; align-items: center; justify-content: center;
         transition: 0.2s;
-        line-height: 0; /* Artı/Eksi işaretini ortalamak için */
+        line-height: 0;
     }
     .qty-btn:hover { transform: scale(1.1); background: #fff; }
     .qty-text { font-size: 22px; font-weight: bold; color: #fff; min-width: 30px; text-align: center; }
 
-    /* Toplam Tutar */
     .item-total { font-size: 22px; font-weight: bold; color: var(--accent-color); min-width: 100px; text-align: right; }
 
-    /* Alt Kısım */
     .total-section { text-align: right; margin-top: 30px; border-top: 2px solid #555; padding-top: 20px; }
     .total-price { font-size: 32px; color: var(--accent-color); font-weight: bold; }
-    
+
     .checkout-btn {
         background: var(--accent-color); color: var(--bg-color);
         font-size: 24px; font-weight: bold; padding: 15px 50px;
@@ -65,7 +61,6 @@
     }
     .checkout-btn:hover { background: #fff; transform: scale(1.05); }
 
-    /* Mikrofon */
     .mic-area { text-align: center; margin-bottom: 30px; }
     .mic-btn-small {
         width: 70px; height: 70px; border-radius: 50%;
@@ -75,8 +70,11 @@
     }
     .mic-btn-small.listening { background: #00FF00; animation: pulse 1.5s infinite; }
     #voiceStatus { margin-top: 10px; font-size: 18px; color: #aaa; }
-    @keyframes pulse { 0% {box-shadow: 0 0 0 0 rgba(0,255,0,0.7);} 70% {box-shadow: 0 0 0 20px rgba(0,255,0,0);} }
 
+    @keyframes pulse {
+        0% {box-shadow: 0 0 0 0 rgba(0,255,0,0.7);}
+        70% {box-shadow: 0 0 0 20px rgba(0,255,0,0);}
+    }
 </style>
 {% endblock %}
 
@@ -86,74 +84,69 @@
 
     <div class="mic-area">
         <div id="micButton" class="mic-btn-small"><i class="fas fa-microphone"></i></div>
-        <div id="voiceStatus">"Siparişi onayla" veya "Market'e dön" diyebilirsiniz...</div>
+        <div id="voiceStatus">
+            "Siparişi onayla", "Markete dön", "Birinci ürünü artır",
+            "İkinci ürünü sil", "Sepeti temizle" diyebilirsiniz...
+        </div>
     </div>
 
     {% if cart_items %}
-        {% for item in cart_items %}
-        <div class="cart-item">
-            <img src="{{ item[4] }}" class="cart-img" onerror="this.src='https://placehold.co/100?text=Urun'">
-            
-            <div class="cart-info">
-                <div class="cart-title">{{ item[0] }}</div>
-                <div class="cart-price">Birim: {{ item[1] }} TL</div>
-            </div>
+    {% for item in cart_items %}
+    <div class="cart-item">
+        <img src="{{ item[4] }}" class="cart-img" onerror="this.src='https://placehold.co/100?text=Urun'">
 
-            <div class="qty-controls">
-                <button class="qty-btn" onclick="updateCartItem({{ item[5] }}, 'decrease')">-</button>
-                <span class="qty-text">{{ item[2] }}</span>
-                <button class="qty-btn" onclick="updateCartItem({{ item[5] }}, 'increase')">+</button>
-            </div>
-
-            <div class="item-total">
-                {{ item[3] }} TL
-            </div>
+        <div class="cart-info">
+            <div class="cart-title">{{ item[0] }}</div>
+            <div class="cart-price">Birim: {{ item[1] }} TL</div>
         </div>
-        {% endfor %}
 
-        <div class="total-section">
-            <div style="font-size: 20px; color: #aaa;">Toplam Tutar</div>
-            <div class="total-price">{{ total_amount }} TL</div>
-            <button class="checkout-btn" onclick="checkout()">Siparişi Onayla</button>
+        <div class="qty-controls">
+            <button class="qty-btn" onclick="updateCartItem('{{ item[5] }}', 'decrease')">-</button>
+            <span class="qty-text">{{ item[2] }}</span>
+            <button class="qty-btn" onclick="updateCartItem('{{ item[5] }}', 'increase')">+</button>
         </div>
+
+        <div class="item-total">
+            {{ item[3] }} TL
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="total-section">
+        <div style="font-size: 20px; color: #aaa;">Toplam Tutar</div>
+        <div class="total-price">{{ total_amount }} TL</div>
+        <button class="checkout-btn" onclick="checkout()">Siparişi Onayla</button>
+    </div>
 
     {% else %}
-        <div style="text-align: center; padding: 50px;">
-            <h2>Sepetiniz boş.</h2>
-            <a href="/market" class="checkout-btn" style="text-decoration: none; display: inline-block; margin-top: 20px;">Alışverişe Başla</a>
-        </div>
+    <div style="text-align: center; padding: 50px;">
+        <h2>Sepetiniz boş.</h2>
+        <a href="/market" class="checkout-btn" style="text-decoration: none; display: inline-block; margin-top: 20px;">Alışverişe Başla</a>
+    </div>
     {% endif %}
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    // --- ADET GÜNCELLEME (ARTIK ÇALIŞACAK) ---
+    /* ========== BASIC ACTIONS ========== */
     async function updateCartItem(productId, action) {
-        try {
-            const res = await fetch('/update_cart', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ product_id: productId, action: action })
-            });
-            const data = await res.json();
-            
-            if (data.status === 'success') {
-                // Sayfayı yenileyerek güncel fiyatları göster
-                location.reload();
-            } else {
-                console.error("Hata:", data.message);
-            }
-        } catch (e) { console.error("Bağlantı hatası:", e); }
+        const res = await fetch('/update_cart', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ product_id: productId, action })
+        });
+        const data = await res.json();
+        if(data.status === "success") location.reload();
+        else alert("Hata: " + (data.message || "bilinmeyen hata"));
     }
 
-    // --- SİPARİŞ ONAY ---
     function checkout() {
         speak("Siparişiniz alındı! Teşekkür ederiz.");
         setTimeout(() => window.location.href = "/", 3000);
     }
 
-    // --- SESLİ KOMUT ---
+    /* ========== VOICE SYSTEM ========== */
     const micBtn = document.getElementById('micButton');
     const statusTxt = document.getElementById('voiceStatus');
     let isListening = false;
@@ -163,6 +156,22 @@
         const u = new SpeechSynthesisUtterance(text);
         u.lang = 'tr-TR';
         window.speechSynthesis.speak(u);
+    }
+
+    function getIndexFromSpeech(cmd){
+        if(cmd.includes("bir")||cmd.includes("1")||cmd.includes("ilk")) return 0;
+        if(cmd.includes("iki")||cmd.includes("2")||cmd.includes("ikinci")) return 1;
+        if(cmd.includes("üç")||cmd.includes("3")||cmd.includes("üçüncü")) return 2;
+        if(cmd.includes("dört")||cmd.includes("4")||cmd.includes("dördüncü")) return 3;
+        if(cmd.includes("beş")||cmd.includes("5")||cmd.includes("beşinci")) return 4;
+        if(cmd.includes("altı")||cmd.includes("6")||cmd.includes("altıncı")) return 5;
+        return -1;
+    }
+
+    async function clearCart(){
+        await fetch('/clear_cart',{method:'POST'});
+        speak("Sepet temizlendi");
+        setTimeout(()=>location.reload(),1000);
     }
 
     function toggleMic() {
@@ -176,30 +185,75 @@
             .then(data => {
                 isListening = false;
                 micBtn.classList.remove('listening');
-                
-                if (data.status === 'success') {
-                    const cmd = data.command.toLowerCase();
-                    statusTxt.textContent = "Algılandı: " + cmd;
 
-                    if (cmd.includes('onayla') || cmd.includes('tamamla')) {
-                        checkout();
-                    } 
-                    else if (cmd.includes('market') || cmd.includes('dön')) {
-                        window.location.href = "/market";
-                    }
-                    else if (cmd.includes('ana sayfa')) {
-                        window.location.href = "/";
-                    }
-                    else {
-                        speak("Anlaşılmadı. 'Onayla' veya 'Market' diyebilirsiniz.");
-                    }
-                } else {
-                    statusTxt.textContent = "Tekrar deneyin...";
+                if (data.status !== 'success') {
+                    speak(data.message || "Ses anlaşılamadı.");
+                    return;
                 }
+
+                const cmd = (data.command || "").toLowerCase();
+                statusTxt.textContent = "Algılandı: " + cmd;
+
+                if (data.state === 'ACCOUNT' || cmd.includes('hesabım')) {
+                    speak("Hesabım sayfasına gidiliyor.");
+                    setTimeout(() => window.location.href = "/account", 1500);
+                    return;
+                }
+                if (cmd.includes('market') || cmd.includes('dön')) { window.location.href = "/market"; return; }
+                if (cmd.includes('ana sayfa')) { window.location.href = "/"; return; }
+
+                // --- HATA DÜZELTME: Veriyi JS formatında alıp kullanıyoruz ---
+                // IDE Hilesi: JSON.parse('...') kullanarak veriyi string gibi gösteriyoruz.
+                const items = JSON.parse('{{ cart_items | tojson | safe }}');
+
+                if (cmd.includes('onayla') || cmd.includes('tamamla')) { checkout(); return; }
+
+                if(cmd.includes("art") || cmd.includes("yükselt") || cmd.includes("çoğalt") || cmd.includes("fazla")){
+                    let i = getIndexFromSpeech(cmd);
+                    if(i >= 0 && items[i]) {
+                        updateCartItem(items[i][5], "increase");
+                        return;
+                    }
+                }
+
+                if(cmd.includes("azalt") || cmd.includes("düşür") || cmd.includes("eksilt") || cmd.includes("az")){
+                    let i = getIndexFromSpeech(cmd);
+                    if(i >= 0 && items[i]) {
+                        updateCartItem(items[i][5], "decrease");
+                        return;
+                    }
+                }
+
+                if(cmd.includes("sil") || cmd.includes("kaldır")){
+                    let i = getIndexFromSpeech(cmd);
+                    if(i >= 0 && items[i]){
+                        fetch('/remove_cart_item',{
+                            method:'POST', headers:{'Content-Type':'application/json'},
+                            body:JSON.stringify({product_id:items[i][5]})
+                        }).then(()=>location.reload());
+                        return;
+                    }
+                }
+
+                if(cmd.includes("tamamını") || cmd.includes("hepsini") || cmd.includes("temizle")){
+                    fetch('/clear_cart',{method:'POST'}).then(()=>location.reload());
+                    return;
+                }
+
+                if (data.state === 'SEARCH' || data.state === 'CATEGORY_CONFIRM' || data.state === 'LIST_PRODUCTS' || cmd.includes("ara")) {
+                    speak("Ürün aramak için market sayfasına yönlendiriliyorsunuz.");
+                    setTimeout(() => window.location.href = "/market", 2000);
+                    return;
+                }
+
+                if (data.message) speak(data.message);
+                else speak("Anlaşılmadı.");
             })
-            .catch(e => {
+            .catch(err => {
+                console.error(err);
                 isListening = false;
                 micBtn.classList.remove('listening');
+                speak("Bağlantı hatası.");
             });
     }
 
@@ -209,10 +263,27 @@
         if (e.code === 'Space') { e.preventDefault(); toggleMic(); }
     });
 
-    window.onload = function() {
-        {% if cart_items %}
-            speak("Sepetinizde {{ cart_items|length }} ürün var. Toplam {{ total_amount }} lira.");
-        {% endif %}
-    };
+    /* ========== SAYFA YÜKLENİNCE OKUMA (HATA GİDERİLDİ) ========== */
+    document.addEventListener('DOMContentLoaded', function() {
+        // HATA ÇÖZÜMÜ:
+        // 1. Veriyi string içine alıp JSON.parse ile okuyoruz. IDE bunu normal string sanıyor.
+        // 2. if/else mantığını JavaScript tarafına taşıyoruz.
+        const cartData = JSON.parse('{{ cart_items | tojson | safe }}');
+        const totalAmount = "{{ total_amount }}";
+
+        if (cartData && cartData.length > 0) {
+            let speechText = `Sepetinizde ${cartData.length} ürün var. Toplam ${totalAmount} lira. `;
+
+            // Jinja döngüsü yerine JavaScript forEach döngüsü kullanıyoruz.
+            cartData.forEach((item, index) => {
+                // item[0]: Ad, item[2]: Adet, item[3]: Toplam
+                speechText += `${index + 1}. ürün ${item[0]}, adet ${item[2]}, satır toplamı ${item[3]} lira. `;
+            });
+
+            speak(speechText);
+        } else {
+            speak("Sepetiniz boş.");
+        }
+    });
 </script>
 {% endblock %}

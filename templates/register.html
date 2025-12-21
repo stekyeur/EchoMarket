@@ -8,7 +8,7 @@
     <style>
         /* --- TEMA DEĞİŞKENLERİ --- */
         :root {
-            /* Dark Mode */
+            /* Dark Mode (Varsayılan) */
             --bg-color: #000000;
             --text-color: #FFFF00;
             --input-bg: #1A1A1A;
@@ -20,8 +20,8 @@
             --mic-border: #FFFFFF;
         }
 
+        /* Light Mode Sınıfı - theme.js tarafından body'ye eklenecek */
         body.light-mode {
-            /* Light Mode */
             --bg-color: #FFFFFF;
             --text-color: #000000;
             --input-bg: #F0F0F0;
@@ -111,11 +111,11 @@
         .voice-status { font-size: 24px; font-weight: bold; min-height: 30px; margin-bottom: 30px; }
 
         /* FORM */
-        .section-title { 
-            text-align: left; 
-            color: var(--section-title); 
-            margin-top: 30px; margin-bottom: 10px; font-size: 28px; 
-            border-bottom: 2px solid var(--section-title); padding-bottom: 5px; 
+        .section-title {
+            text-align: left;
+            color: var(--section-title);
+            margin-top: 30px; margin-bottom: 10px; font-size: 28px;
+            border-bottom: 2px solid var(--section-title); padding-bottom: 5px;
         }
 
         input {
@@ -124,13 +124,13 @@
             border: 3px solid var(--input-border); border-radius: 10px; transition: all 0.3s ease;
         }
         input:focus {
-            outline: none; border-color: #00FF00; 
+            outline: none; border-color: #00FF00;
             box-shadow: 0 0 15px rgba(0, 255, 0, 0.5); transform: scale(1.02);
         }
         input::placeholder { color: #888; }
 
         button.action-btn {
-            padding: 25px; font-size: 32px; 
+            padding: 25px; font-size: 32px;
             background: var(--btn-bg); color: var(--btn-text);
             font-weight: bold; cursor: pointer; margin-top: 30px; width: 100%;
             border: 4px solid var(--input-border); border-radius: 15px;
@@ -189,15 +189,6 @@
 <div class="notification" id="notification"></div>
 
 <script>
-    // --- TEMA MANTIĞI ---
-    const themeBtn = document.getElementById('themeToggle');
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') { document.body.classList.add('light-mode'); }
-
-    themeBtn.addEventListener('click', () => {
-        document.body.classList.toggle('light-mode');
-        localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
-    });
 
     // --- MEVCUT JS MANTIĞI ---
     const micButton = document.getElementById('micButton');
@@ -290,7 +281,7 @@
         if (currentStepIndex < steps.length) {
             let step = steps[currentStepIndex];
             fields[step.key].focus();
-            speak(step.question, true); 
+            speak(step.question, true);
         } else {
             isGuidedMode = false;
             speak("Tüm bilgiler alındı. Kaydı tamamlamak için 'Kaydı tamamla' deyin.", true);
@@ -443,5 +434,8 @@
         }
     });
 </script>
+
+<script src="{{ url_for('static', filename='theme.js') }}"></script>
+
 </body>
 </html>

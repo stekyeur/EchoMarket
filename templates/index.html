@@ -5,13 +5,13 @@
     <title>EchoMarket - Hoş Geldiniz</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- TEMA DEĞİŞKENLERİ (Varsayılan DARK) --- */
+        /* --- TEMA DEĞİŞKENLERİ --- */
         :root {
             --bg-color: #000000;
             --text-color: #FFFF00;
             --btn-bg: #1A1A1A;
             --btn-border: #FFFF00;
-            --btn-text: #FFFFFF;
+            --btn-text: #FFFFFF; /* Buton içi yazı rengi */
             --mic-border: #FFFFFF;
             --pulse-color: #00FF00;
         }
@@ -40,141 +40,141 @@
         }
 
         /* ORTALAMA İÇİN DÜZELTME */
-        .choice-container { 
-            display: flex; 
-            gap: 40px; 
-            width: 100%; 
-            max-width: 800px; 
-            justify-content: center; /* Yatayda ortalar */
+        .choice-container {
+            display: flex;
+            gap: 40px;
+            width: 100%;
+            max-width: 800px;
+            justify-content: center;
             margin-top: 30px;
         }
-        
+
+        /* Linkleri Buton Gibi Gösteriyoruz */
         .big-btn {
-            flex: 1; 
-            padding: 30px; 
-            font-size: 32px; 
+            flex: 1;
+            padding: 30px;
+            font-size: 32px;
             font-weight: bold;
-            background: var(--btn-bg); 
-            color: var(--btn-text); 
+            background: var(--btn-bg);
+            color: var(--btn-text);
             border: 4px solid var(--btn-border);
-            border-radius: 20px; 
-            cursor: pointer; 
+            border-radius: 20px;
+            cursor: pointer;
             transition: all 0.3s;
-            text-decoration: none;
-            display: flex;             /* Metni ortalamak için */
+            text-decoration: none; /* Alt çizgiyi kaldır */
+            display: flex;
             align-items: center;
             justify-content: center;
         }
-        .big-btn:hover { 
-            transform: translateY(-5px); 
-            background-color: var(--text-color);
+        .big-btn:hover {
+            transform: translateY(-5px);
+            background-color: var(--text-color); /* Hoverda zıt renk */
             color: var(--bg-color);
         }
-        
-        /* Link kapsayıcısı ayarı */
-        a { text-decoration: none; flex: 1; display: flex; } 
 
         .theme-toggle-wrapper { position: absolute; top: 20px; right: 20px; }
-        .btn-theme { background: transparent; border: 2px solid var(--text-color); color: var(--text-color); padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold;}
-        
+
+        .btn-theme {
+            background: transparent;
+            border: 2px solid var(--text-color);
+            color: var(--text-color);
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .mic-button { width: 180px; height: 180px; border-radius: 50%; background: linear-gradient(135deg, #FFFF00 0%, #FFD700 100%); border: 8px solid var(--mic-border); font-size: 70px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
         .mic-button:hover { transform: scale(1.05); }
         .mic-button.listening { animation: pulse 1.5s infinite; background: var(--pulse-color); }
-        
+
         @keyframes pulse { 0% {box-shadow: 0 0 0 0 rgba(0,255,0,0.7);} 70% {box-shadow: 0 0 0 30px rgba(0,255,0,0);} }
     </style>
 </head>
 <body>
-    <div class="theme-toggle-wrapper">
-        <button id="themeToggle" class="btn-theme"><i class="fas fa-adjust"></i> Tema</button>
-    </div>
+<div class="theme-toggle-wrapper">
+    <button id="themeToggle" class="btn-theme">
+        <i class="fas fa-adjust"></i> Tema
+    </button>
+</div>
 
-    <h1>EchoMarket</h1>
-    <p style="font-size: 24px; max-width: 600px;">Giriş yapmak için <b>"Giriş"</b>, kayıt olmak için <b>"Kayıt"</b> deyin.</p>
+<h1>EchoMarket</h1>
+<p style="font-size: 24px; max-width: 600px;">Giriş yapmak için <b>"Giriş"</b>, kayıt olmak için <b>"Kayıt"</b> deyin.</p>
 
-    <button id="micButton" class="mic-button">🎤</button>
-    <div id="status" style="font-size: 24px; margin-top: 20px; font-weight: bold;">Mikrofona basın</div>
+<button id="micButton" class="mic-button">🎤</button>
+<div id="status" style="font-size: 24px; margin-top: 20px; font-weight: bold;">Mikrofona basın</div>
 
-    <div class="choice-container">
-        <a href="/login"><button class="big-btn">GİRİŞ YAP</button></a>
-        <a href="/register"><button class="big-btn">KAYIT OL</button></a>
-    </div>
+<div class="choice-container">
+    <a href="/login" class="big-btn">GİRİŞ YAP</a>
+    <a href="/register" class="big-btn">KAYIT OL</a>
+</div>
 
-    <script>
-        // --- TEMA AYARLARI ---
-        const themeBtn = document.getElementById('themeToggle');
-        if (localStorage.getItem('theme') === 'light') { document.body.classList.add('light-mode'); }
+<script>
+    const micButton = document.getElementById('micButton');
+    const statusDiv = document.getElementById('status');
+    let isListening = false;
 
-        themeBtn.addEventListener('click', () => {
-            document.body.classList.toggle('light-mode');
-            localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
-        });
-        
-        // --- MİKROFON VE SESLİ KOMUT MANTIĞI ---
-        const micButton = document.getElementById('micButton');
-        const statusDiv = document.getElementById('status');
-        let isListening = false;
+    // Konuşma Fonksiyonu (TTS)
+    function speak(text) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'tr-TR';
+        window.speechSynthesis.speak(u);
+    }
 
-        // Konuşma Fonksiyonu (TTS)
-        function speak(text) {
-            window.speechSynthesis.cancel();
-            const u = new SpeechSynthesisUtterance(text);
-            u.lang = 'tr-TR';
-            window.speechSynthesis.speak(u);
-        }
+    // Dinleme Fonksiyonu
+    async function listen() {
+        if (isListening) return;
 
-        // Dinleme Fonksiyonu
-        async function listen() {
-            if (isListening) return; // Zaten dinliyorsa tekrar başlatma
-            
-            isListening = true;
-            micButton.classList.add('listening');
-            statusDiv.textContent = "Dinliyorum...";
+        isListening = true;
+        micButton.classList.add('listening');
+        statusDiv.textContent = "Dinliyorum...";
 
-            try {
-                // Backend'e istek at
-                const res = await fetch('/dinle', { method: 'POST' });
-                const data = await res.json();
+        try {
+            const res = await fetch('/dinle', { method: 'POST' });
+            const data = await res.json();
 
-                isListening = false;
-                micButton.classList.remove('listening');
+            isListening = false;
+            micButton.classList.remove('listening');
 
-                if (data.status === 'success') {
-                    statusDiv.textContent = data.message;
-                    
-                    // Python'dan gelen YÖNLENDİRME (Redirect) emri var mı?
-                    if (data.action === 'redirect' && data.redirect_url) {
-                        speak(data.message); // Örn: "Giriş sayfasına gidiliyor"
-                        setTimeout(() => {
-                            window.location.href = data.redirect_url;
-                        }, 1000);
-                    } else {
-                        speak(data.message);
-                    }
+            if (data.status === 'success') {
+                statusDiv.textContent = data.message;
+
+                if (data.action === 'redirect' && data.redirect_url) {
+                    speak(data.message);
+                    setTimeout(() => {
+                        window.location.href = data.redirect_url;
+                    }, 1000);
                 } else {
-                    statusDiv.textContent = data.message;
                     speak(data.message);
                 }
-
-            } catch (err) {
-                console.error(err);
-                isListening = false;
-                micButton.classList.remove('listening');
-                statusDiv.textContent = "Hata oluştu.";
-                speak("Bir hata oluştu.");
+            } else {
+                statusDiv.textContent = data.message;
+                speak(data.message);
             }
+
+        } catch (err) {
+            console.error(err);
+            isListening = false;
+            micButton.classList.remove('listening');
+            statusDiv.textContent = "Hata oluştu.";
+            speak("Bir hata oluştu.");
         }
+    }
 
-        // Tıklama Olayı
-        micButton.addEventListener('click', listen);
+    micButton.addEventListener('click', listen);
 
-        // Space Tuşu Olayı
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' || e.key === ' ') {
-                e.preventDefault(); // Sayfanın kaymasını engelle
-                listen();
-            }
-        });
-    </script>
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' || e.key === ' ') {
+            e.preventDefault();
+            listen();
+        }
+    });
+</script>
+
+<script src="{{ url_for('static', filename='theme.js') }}"></script>
 </body>
 </html>

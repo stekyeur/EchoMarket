@@ -257,21 +257,7 @@
 <div class="notification" id="notification" role="alert" aria-live="assertive"></div>
 
 <script>
-    // --- TEMA YÖNETİMİ ---
-    const themeBtn = document.getElementById('themeToggle');
-    
-    // Kayıtlı temayı kontrol et
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
-        document.body.classList.add('light-mode');
-    }
 
-    // Butona tıklanınca değiştir
-    themeBtn.addEventListener('click', () => {
-        document.body.classList.toggle('light-mode');
-        const isLight = document.body.classList.contains('light-mode');
-        localStorage.setItem('theme', isLight ? 'light' : 'dark');
-    });
 
     // --- MEVCUT JS KODLARI ---
     const micButton = document.getElementById('micButton');
@@ -513,5 +499,6 @@
         }
     });
 </script>
+<script src="{{ url_for('static', filename='theme.js') }}"></script>
 </body>
 </html>
