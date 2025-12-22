@@ -177,12 +177,21 @@
     const statusTxt = document.getElementById('voiceStatus');
     let isListening = false;
 
-    function speak(text) {
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'tr-TR';
-        window.speechSynthesis.speak(u);
-    }
+    function speak(text, afterSpeak = null) {
+    window.speechSynthesis.cancel();
+
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'tr-TR';
+
+    u.onend = () => {
+        if(afterSpeak){
+            setTimeout(afterSpeak, 400); // küçük nefes payı :)
+        }
+    };
+
+    window.speechSynthesis.speak(u);
+}
+
 
     function getIndexFromSpeech(cmd){
         if(cmd.includes("bir")||cmd.includes("1")||cmd.includes("ilk")) return 0;
@@ -237,6 +246,7 @@
                 if(cmd.includes("art") || cmd.includes("yükselt") || cmd.includes("çoğalt") || cmd.includes("fazla")){
                     let i = getIndexFromSpeech(cmd);
                     if(i >= 0 && items[i]) {
+                        speak(`${i+1}. ürün artırılıyor`);
                         updateCartItem(items[i][5], "increase");
                         return;
                     }
@@ -245,6 +255,7 @@
                 if(cmd.includes("azalt") || cmd.includes("düşür") || cmd.includes("eksilt") || cmd.includes("az")){
                     let i = getIndexFromSpeech(cmd);
                     if(i >= 0 && items[i]) {
+                        speak(`${i+1}. ürün azaltılıyor`);
                         updateCartItem(items[i][5], "decrease");
                         return;
                     }
@@ -253,16 +264,21 @@
                 if(cmd.includes("sil") || cmd.includes("kaldır")){
                     let i = getIndexFromSpeech(cmd);
                     if(i >= 0 && items[i]){
+                        speak(`${i+1}. ürün siliniyor`);
                         fetch('/remove_cart_item',{
-                            method:'POST', headers:{'Content-Type':'application/json'},
+                            method:'POST',
+                            headers:{'Content-Type':'application/json'},
                             body:JSON.stringify({product_id:items[i][5]})
                         }).then(()=>location.reload());
+
                         return;
                     }
                 }
 
                 if(cmd.includes("tamamını") || cmd.includes("hepsini") || cmd.includes("temizle")){
+                    speak("Sepet temizleniyor");
                     fetch('/clear_cart',{method:'POST'}).then(()=>location.reload());
+
                     return;
                 }
 
@@ -306,9 +322,15 @@
                 speechText += `${index + 1}. ürün ${item[0]}, adet ${item[2]}, satır toplamı ${item[3]} lira. `;
             });
 
-            speak(speechText);
+            speak(speechText, () => {
+                toggleMic();
+            });
+
         } else {
-            speak("Sepetiniz boş.");
+            speak("Sepetiniz boş.", () => {
+                toggleMic();
+            });
+
         }
     });
 </script>

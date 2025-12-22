@@ -7,7 +7,7 @@ import random
 from config import DB_CONFIG
 
 # --- AYARLAR ---
-DOSYA_KLASORU = r"C:\Users\arzuf\OneDrive\Belgeler\GitHub\EchoMarket\txt_2"
+DOSYA_KLASORU = r"C:\Users\betul\Documents\GitHub\EchoMarket\EchoMarket\txt_2"
 
 # --- YARDIMCI FONKSİYONLAR ---
 def clean_rating(rating_str):

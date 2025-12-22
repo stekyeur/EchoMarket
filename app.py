@@ -30,7 +30,7 @@ def clean_search_text(text):
     filter_words = [
         "en ucuz", "uygun fiyatlı", "uygun", "en düşük fiyatlı",
         "en pahalı", "en yüksek fiyatlı", "pahalı",
-        "en iyi", "en yüksek puan", "yüksek puan",
+        "en iyi", "en yüksek puan", "yüksek puan","en yüksek puanlı",
         "önerilen", "kaliteli"
     ]
     for f in filter_words:
@@ -74,18 +74,41 @@ def get_cart_count(user_id):
 
 # Kategori Listesi (Sesli komut için)
 kategoriler = {
-    "Kahvaltılık": ["yumurta","peynir","zeytin","reçel","bal","tereyağı","kaşar","salam","sucuk","sosis","ekmek","labne","yoğurt"],
-    "Atıştırmalık": ["çıtır çerez","popcorn","kuru yemiş","kraker","cips","atıştırmalık"],
-    "Ağız Bakım": ["diş macunu","diş fırçası","gargara"],
-    "Banyo Ürünleri": ["duş jeli","şampuan","sabun","lif"],
-    "Bulaşık": ["bulaşık deterjanı","sünger","tablet"],
-    "İçecek": ["meyve suyu","limonata","soğuk çay","su","kola","gazoz","soda","ayran"],
-    "Bakliyat": ["pirinç","bulgur","mercimek","nohut","fasulye","makarna"],
-    "Temizlik": ["çamaşır suyu","yüzey temizleyici","deterjan","yumuşatıcı"],
-    "Yağ": ["zeytinyağı","ayçiçek yağı","tereyağı"],
-    "Unlu Mamul": ["un","maya","kabartma tozu","vanilya","simit","poğaça"],
-    "Şekerleme": ["çikolata","gofret","şeker"]
+    "Kahvaltılık": ["yumurta","peynir","zeytin","reçel","bal","tereyağı","kaşar","salam","sucuk","sosis","kreması","ekmek","labne","yoğurt"],
+    "Atıştırmalık": ["çıtır çerez","popcorn","kuru yemiş karışık","mini kraker","atıştırmalık","atıştırma"],
+    "Ağız Bakım": ["diş macunu","diş fırçası","ağız gargarası","diş ipi","diş","ağız","dil"],
+    "Banyo Ürünleri": ["duş jeli","şampuan","sabun","banyo lifi","lif","banyo","duş","vücut","losyon"],
+    "Bulaşık Makinesi Deterjanı": ["bulaşık makinesi kapsülü","toz deterjan","parlatıcı","makine tuzu"],
+    "Bulaşık Yıkama": ["elde bulaşık deterjanı","sünger","bulaşık teli","bulaşık deterjanı"],
+    "Deodorant": ["roll-on","sprey deodorant","stick deodorant","deodorant"],
+    "Gazsız İçecek": ["meyve suyu","limonata","soğuk çay","gazsız içecek","ice tea","salep","kaynak suyu","toz içecek","milkshake","oralet"],
+    "Hazır Çorba": ["domates çorbası","mercimek çorbası","mantar çorbası","hazır çorba","çorba"],
+    "Kahvaltılık Gevrek": ["corn flakes","yulaf ezmesi","granola","gevrek","tahıl gevreği"],
+    "Kahve": ["türk kahvesi","filtre kahve","espresso","3ü1 arada","latte","cappuciono","kahve","kahvesi"],
+    "Kağıt Havlu": ["kağıt havlu rulo","çok amaçlı havlu","kağıt havlu"],
+    "Konserveler": ["ton balığı","mısır konservesi","bezelye konservesi","konservesi"],
+    "Kuru Gıda": ["pirinç","bulgur","mercimek","nohut","fasulye","mantı","baharat","tarhana","kurusu","harcı","sos"],
+    "Kuruyemiş": ["fındık","badem","fıstık","kaju","karışık kuruyemiş","kuruyemiş","çekirdek","ceviz","ayçekirdeği"],
+    "Makarna": ["spagetti","burgu makarna","penne","fiyonk","makarna","erişte","noodle"],
+    "Mutfak Banyo Temizlik": ["çamaşır suyu","yüzey temizleyici","banyo temizleyici","fayans","duşakabin","mutfak temizleyici","lavabo açıcı","yağ temizleyici","kireç","gider","fırın","ocak","sarı güç"],
+    "Saç Bakımı": ["şampuan","saç kremi","saç maskesi","saç yağı","dökülme","saç","keratin","tarak"],
+    "Sıvı Yağlar": ["zeytinyağı","ayçiçek yağı","mısır yağı"],
+    "Toz Şeker": ["toz şekeri","pudra şekeri"],
+    "Tıraş Ürünleri": ["tıraş köpüğü","tıraş bıçağı","tıraş sonrası losyon","tıraş"],
+    "Unlu Mamul": ["poğaça","simit","börek","çörek","kömbe","kurabiye","katmer"],
+    "Çamaşır Deterjanı": ["toz deterjan","sıvı deterjan","kapsül deterjan"],
+    "Çamaşır Yıkama Ürünleri": ["leke çıkarıcı","renk koruyucu","çamaşır filesi","deterjan"],
+    "Çikolata": ["çikolata"],
+    "Çay": ["çay"],
+    "Süt": ["süt"],
+    "Kek": ["kek"],
+    "Protein Bar": ["protein bar"],
+    "Salça": ["salça"],
+    "Tuvalet Kağıdı": ["tuvalet kağıdı"],
+    "Yumuşatıcı": ["yumuşatıcı"],
+    "Un": ["un"],
 }
+
 
 # --- ROTALAR ---
 
@@ -519,6 +542,62 @@ def checkout_action():
         cur.execute('DELETE FROM cartitem WHERE sessionid=%s', (sid,))
         conn.commit()
         return jsonify({'status': 'success', 'order_id': oid})
+    except Exception as e:
+        if conn: conn.rollback()
+        return jsonify({'status': 'error', 'message': str(e)})
+    finally:
+        close_db_connection(conn)
+@app.route('/remove_cart_item', methods=['POST'])
+def remove_cart_item():
+    if 'user_id' not in session:
+        return jsonify({'status': 'error', 'message': 'Giriş yapın'})
+
+    product_id = request.form.get("product_id") or request.json.get("product_id")
+
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        cur.execute('SELECT id FROM shoppingsession WHERE userid=%s',
+                    (session['user_id'],))
+        s_row = cur.fetchone()
+        if not s_row:
+            return jsonify({'status': 'error', 'message': 'Sepet bulunamadı'})
+
+        cur.execute('DELETE FROM cartitem WHERE sessionid=%s AND productid=%s',
+                    (s_row[0], product_id))
+
+        conn.commit()
+        return jsonify({'status': 'success'})
+
+    except Exception as e:
+        if conn: conn.rollback()
+        return jsonify({'status': 'error', 'message': str(e)})
+    finally:
+        close_db_connection(conn)
+
+@app.route('/clear_cart', methods=['POST'])
+def clear_cart():
+    if 'user_id' not in session:
+        return jsonify({'status': 'error', 'message': 'Giriş yapın'})
+
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        cur.execute('SELECT id FROM shoppingsession WHERE userid=%s',
+                    (session['user_id'],))
+        s_row = cur.fetchone()
+        if not s_row:
+            return jsonify({'status': 'success'})
+
+        cur.execute('DELETE FROM cartitem WHERE sessionid=%s', (s_row[0],))
+        conn.commit()
+
+        return jsonify({'status': 'success'})
+
     except Exception as e:
         if conn: conn.rollback()
         return jsonify({'status': 'error', 'message': str(e)})

@@ -353,8 +353,17 @@
         if (textToRead) {
             const utterance = new SpeechSynthesisUtterance(textToRead);
             utterance.lang = 'tr-TR';
+
+            // ✔️ Konuşma bittikten sonra otomatik dinlemeye başla
+            utterance.onend = () => {
+                setTimeout(() => {
+                    toggleMic();
+                }, 300);
+            };
+
             window.speechSynthesis.speak(utterance);
         }
     });
+
 </script>
 {% endblock %}

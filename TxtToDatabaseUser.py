@@ -6,7 +6,7 @@ import bcrypt
 from config import DB_CONFIG
 
 # --- AYARLAR ---
-DOSYA_KLASORU = r"C:\Users\arzuf\OneDrive\Belgeler\GitHub\EchoMarket\txt_2"
+DOSYA_KLASORU = r"C:\Users\betul\Documents\GitHub\EchoMarket\txt_2"
 KULLANICI_DOSYASI = "kullanici_verileri.txt"
 ADRES_DOSYASI = "address_data.txt"
 

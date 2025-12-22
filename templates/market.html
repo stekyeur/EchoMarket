@@ -231,6 +231,10 @@
         "en iyi", "en yüksek puan", "yüksek puan", "önerilen", "uygun"
     ];
 
+    const guideSpeechText =
+    "Bir ürünü sepete ekleyebilirsiniz " +
+    "Sonraki diyerek diğer ürünlere geçebilirsiniz veya sepetim diyerek sepetinize gidebilirsiniz.";
+
     const productSpeechText = `
     {% if welcome_mode %}
         Hoş geldiniz. Sepetim, hesabım diyebilir veya aramak istediğiniz ürünü söyleyebilirsiniz.
@@ -255,9 +259,15 @@
 `;
 
     function startApp() {
-        overlay.style.display = 'none';
+    overlay.style.display = 'none';
+
+    {% if products %}
+        speak(productSpeechText + " " + guideSpeechText, true);
+    {% else %}
         speak(productSpeechText, true);
-    }
+    {% endif %}
+}
+
 
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -277,8 +287,14 @@
 
         if (urlParams.has('page') || urlParams.has('q')) {
             overlay.style.display = 'none';
-            speak(productSpeechText, true);
+
+            {% if products %}
+                speak(productSpeechText + " " + guideSpeechText, true);
+            {% else %}
+                speak(productSpeechText, true);
+            {% endif %}
         }
+
     };
 
     function setActiveButton(filterName) {
@@ -445,7 +461,8 @@
                     headerCartBtn.innerHTML = `<i class="fas fa-shopping-cart"></i> Sepetim (${data.cart_count})`;
                 }
 
-                speak("Sepete eklendi.", true);
+                speak("Ürün sepete eklendi. " + guideSpeechText, true);
+
             } else {
                 speak("Hata oluştu: " + (data.message || "Bilinmeyen hata"), true);
             }

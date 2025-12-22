@@ -6,7 +6,7 @@ import psycopg2
 from config import DB_CONFIG
 
 # --- AYARLAR ---
-DOSYA_KLASORU = r"C:\Users\arzuf\OneDrive\Belgeler\GitHub\EchoMarket\txt_2" # Klasör yolunu kontrol edin
+DOSYA_KLASORU = r"C:\Users\betul\Documents\GitHub\EchoMarket\txt_2" # Klasör yolunu kontrol edin
 
 # --- TEMİZLİK FONKSİYONLARI ---
 def fiyat_temizle(fiyat_str):
