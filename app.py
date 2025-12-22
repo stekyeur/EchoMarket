@@ -199,7 +199,7 @@ def market():
     try:
         conn = get_db_connection()
         cur = conn.cursor()
-        offset = (page - 1) * 6
+        offset = (page - 1) * 4
 
         base_query = """
                      SELECT v.id, v.name, v.price, v.image_url, v.category_name, COALESCE(AVG(pr.rating), 0) as avg_rating
@@ -214,7 +214,7 @@ def market():
         elif is_top_rated: order = " ORDER BY avg_rating DESC NULLS LAST"
         else: order = " ORDER BY v.id"
 
-        limits = f" LIMIT 6 OFFSET {offset}"
+        limits = f" LIMIT 4 OFFSET {offset}"
 
         rows = []
 
@@ -223,7 +223,7 @@ def market():
     base_query + " WHERE v.name ~* %s" + group + order + limits,
     (pattern,)
 )
-
+        rows = cur.fetchall()
 
 # 2. Kategoriyle Ara
         if not rows and clean_query:
@@ -292,7 +292,7 @@ def search_products():
         else:
             order = " ORDER BY v.id"
 
-        limits = f" LIMIT 6 OFFSET {offset}"
+        limits = f" LIMIT 4 OFFSET {offset}"
 
         # 1️⃣ İSİM ARAMA (REGEX + KELİME SINIRI)
         if clean_query:
