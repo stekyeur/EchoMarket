@@ -97,6 +97,18 @@
         .btn-account:hover {
             color: var(--accent-color);
         }
+        
+        /* Çıkış Yap Butonu (Kırmızı) */
+        .btn-logout {
+            color: #ff4d4d;
+            border: 1px solid #ff4d4d;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .btn-logout:hover {
+            background: #ff4d4d;
+            color: white;
+        }
 
         .container {
             flex: 1;
@@ -113,20 +125,31 @@
 <body>
 
 <div class="header">
-    <a href="/" class="logo">EchoMarket</a>
+    <a href="{{ '/market' if session.get('user_id') else '/' }}" class="logo">EchoMarket</a>
 
     <div class="nav-buttons">
-        <a href="/cart" class="btn-account" style="margin-right: 10px;">
-            <i class="fas fa-shopping-cart"></i> Sepetim ({{ cart_count if cart_count else 0 }})
-        </a>
+        
+        {% if session.get('user_id') %}
+            <a href="/cart" class="btn-account">
+                <i class="fas fa-shopping-cart"></i> Sepetim ({{ cart_count if cart_count else 0 }})
+            </a>
+        {% endif %}
 
         <button class="theme-toggle-btn" id="themeToggle">
             <i class="fas fa-adjust"></i> Tema
         </button>
 
-        <a href="/account" class="btn-account">
-            <i class="fas fa-user"></i> Hesabım
-        </a>
+        {% if session.get('user_id') %}
+            <a href="/account" class="btn-account">
+                <i class="fas fa-user"></i> Hesabım
+            </a>
+            
+            <a href="/logout" class="btn-account btn-logout">
+                <i class="fas fa-sign-out-alt"></i> Çıkış
+            </a>
+        {% else %}
+            <a href="/login" class="btn-account">Giriş Yap</a>
+        {% endif %}
     </div>
 </div>
 
@@ -135,7 +158,23 @@
     {% endblock %}
 </div>
 
-<script src="{{ url_for('static', filename='theme.js') }}"></script>
+<script>
+    const themeBtn = document.getElementById('themeToggle');
+    // Sayfa yüklendiğinde temayı kontrol et
+    if (localStorage.getItem('theme') === 'light') {
+        document.body.classList.add('light-mode');
+    }
+
+    themeBtn.addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+        // Tercihi kaydet
+        if (document.body.classList.contains('light-mode')) {
+            localStorage.setItem('theme', 'light');
+        } else {
+            localStorage.setItem('theme', 'dark');
+        }
+    });
+</script>
 
 {% block scripts %}{% endblock %}
 

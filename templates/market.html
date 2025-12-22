@@ -8,98 +8,117 @@
     <style>
         /* --- TEMA DEĞİŞKENLERİ --- */
         :root {
-            /* Varsayılan (Dark Mode) */
-            --bg-color: #000000;
-            --text-color: #FFFF00;
-            --card-bg: #1A1A1A;
-            --card-border: #FFFF00;
-            --accent-color: #00FF00; /* Yeşil vurgular */
-            --header-border: #333;
-            --mic-bg: #FFFF00;
-            --mic-border: #FFFFFF;
-            --status-color: #FFFFFF;
+            --bg-color: #000000; --text-color: #FFFF00; --card-bg: #1A1A1A; --card-border: #FFFF00;
+            --accent-color: #00FF00; --header-border: #333; --mic-bg: #FFFF00; --mic-border: #FFFFFF;
+            --status-color: #FFFFFF; --star-color: #FFD700; --input-bg: #333;
         }
-
-        /* Light Mode Ayarları */
         body.light-mode {
-            --bg-color: #FFFFFF;
-            --text-color: #000000;
-            --card-bg: #F0F0F0;
-            --card-border: #000000;
-            --accent-color: #00AA00; /* Koyu yeşil */
-            --header-border: #CCC;
-            --mic-bg: #FFD700;
-            --mic-border: #000000;
-            --status-color: #000000;
+            --bg-color: #FFFFFF; --text-color: #000000; --card-bg: #F0F0F0; --card-border: #000000;
+            --accent-color: #00AA00; --header-border: #CCC; --mic-bg: #FFD700; --mic-border: #000000;
+            --status-color: #000000; --input-bg: #FFF;
         }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Arial', sans-serif;
-            margin: 0; padding: 20px; text-align: center;
-            transition: background-color 0.3s, color 0.3s;
+            background-color: var(--bg-color); color: var(--text-color); font-family: 'Arial', sans-serif;
+            margin: 0; padding: 20px; text-align: center; transition: background-color 0.3s, color 0.3s;
+        }
+        header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 2px solid var(--header-border); margin-bottom: 30px; }
+        h1 { font-size: 40px; margin: 0; }
+        
+        /* ARAMA ÇUBUĞU */
+        .search-container { margin: 20px auto 10px auto; max-width: 600px; display: flex; gap: 10px; justify-content: center; }
+        .search-input {
+            flex: 1; padding: 15px; font-size: 18px; border-radius: 10px; 
+            border: 2px solid var(--text-color); background: var(--input-bg); color: var(--text-color);
+        }
+        .search-btn {
+            padding: 15px 25px; font-size: 18px; border-radius: 10px; border: none;
+            background: var(--accent-color); color: #000; font-weight: bold; cursor: pointer;
         }
 
-        header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding-bottom: 20px; border-bottom: 2px solid var(--header-border);
-            margin-bottom: 30px;
+        /* YENİ EKLENEN FİLTRE BUTONLARI */
+        .filter-container {
+            display: flex; justify-content: center; gap: 15px; margin-bottom: 20px;
         }
-        h1 { font-size: 40px; margin: 0; }
+        .filter-btn {
+            padding: 8px 16px; border: 2px solid var(--text-color); background: transparent;
+            color: var(--text-color); border-radius: 20px; cursor: pointer; transition: 0.3s;
+            font-size: 14px; font-weight: bold;
+        }
+        .filter-btn:hover { border-color: var(--accent-color); }
+        .filter-btn.active {
+            background: var(--accent-color); color: #000; border-color: var(--accent-color);
+        }
 
         .mic-container { margin: 30px 0; }
         .mic-button {
-            width: 120px; height: 120px; border-radius: 50%;
-            background: var(--mic-bg);
-            border: 6px solid var(--mic-border);
-            font-size: 50px; cursor: pointer; transition: all 0.3s;
-            display: flex; align-items: center; justify-content: center; margin: 0 auto;
+            width: 120px; height: 120px; border-radius: 50%; background: var(--mic-bg); border: 6px solid var(--mic-border);
+            font-size: 50px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; margin: 0 auto;
         }
         .mic-button.listening { background: var(--accent-color); box-shadow: 0 0 40px var(--accent-color); transform: scale(1.1); }
-
         #status { font-size: 24px; margin-top: 15px; color: var(--status-color); }
-
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; padding: 20px; }
+        
+        /* --- ÜRÜN IZGARASI --- */
+        .products-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px; 
+            padding: 20px; 
+            max-width: 1200px; 
+            margin: 0 auto;
+        }
+        @media (max-width: 900px) { .products-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .products-grid { grid-template-columns: 1fr; } }
 
         .product-card {
-            position: relative;
-            background: var(--card-bg);
-            border: 4px solid var(--card-border);
+            position: relative; background: var(--card-bg); border: 4px solid var(--card-border);
             border-radius: 20px; padding: 20px; text-align: center; transition: transform 0.3s;
+            display: flex; flex-direction: column; justify-content: space-between;
+            cursor: pointer;
         }
-        .product-card:hover { transform: scale(1.05); border-color: #00FFFF; }
-
+        .product-card:hover { transform: scale(1.03); border-color: #00FFFF; }
         .card-number {
             position: absolute; top: -20px; left: -20px; width: 60px; height: 60px;
             background: var(--accent-color); color: #000; font-size: 32px; font-weight: bold;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            border: 4px solid #fff; z-index: 10;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 4px solid #fff; z-index: 10;
         }
+        .product-img { width: 100%; height: 200px; object-fit: contain; background-color: #fff; border-radius: 10px; margin-bottom: 15px; }
+        .product-name { font-size: 24px; font-weight: bold; margin-bottom: 10px; color: var(--text-color); min-height: 60px; display: flex; align-items: center; justify-content: center;}
+        .product-price { font-size: 28px; color: var(--accent-color); font-weight: bold; }
+        .product-rating { margin-top: 5px; font-size: 20px; color: var(--star-color); margin-bottom: 15px; }
+        .rating-val { font-size: 16px; color: var(--text-color); margin-left: 5px; opacity: 0.8; }
 
-        .product-img { width: 100%; height: 250px; object-fit: contain; background-color: #fff; border-radius: 10px; margin-bottom: 15px; }
-        .product-name { font-size: 32px; font-weight: bold; margin-bottom: 10px; color: var(--text-color); }
-        .product-price { font-size: 36px; color: var(--accent-color); font-weight: bold; }
+        .add-cart-btn {
+            background-color: var(--accent-color); color: #000; border: none; padding: 12px; width: 100%;
+            border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .add-cart-btn:hover { opacity: 0.8; transform: scale(1.02); }
+        
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 40px; margin: 40px 0; }
+        .page-arrow {
+            background: transparent; border: 3px solid var(--text-color); color: var(--text-color);
+            width: 60px; height: 60px; border-radius: 50%; font-size: 30px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: 0.3s; text-decoration: none;
+        }
+        .page-arrow:hover:not(.disabled) { background: var(--accent-color); color: #000; border-color: var(--accent-color); }
+        .page-arrow.disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; border-color: #555; color: #555; }
+        .page-info { font-size: 24px; font-weight: bold; }
 
-        /* Başlangıç Ekranı */
         #start-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.98); z-index: 9999;
             display: flex; align-items: center; justify-content: center; cursor: pointer;
         }
         .start-msg { font-size: 48px; color: #00FF00; border: 5px solid #00FF00; padding: 40px; border-radius: 20px; }
-
-        /* Linkler */
+        
+        .welcome-screen {
+            font-size: 32px; margin-top: 50px; opacity: 0.9; line-height: 1.6;
+            background: rgba(255, 255, 255, 0.05); padding: 40px; border-radius: 20px;
+        }
+        
         .nav-link { color: var(--text-color); text-decoration: none; display: flex; align-items: center; gap: 5px; }
         .nav-link:hover { color: var(--accent-color); }
-
-        /* Tema Butonu */
-        .theme-btn {
-            padding: 10px 20px; font-size: 18px; border-radius: 10px;
-            border: 3px solid var(--text-color);
-            background: transparent; color: var(--text-color); cursor: pointer;
-            display: flex; align-items: center; gap: 8px;
-        }
+        .theme-btn { padding: 10px 20px; font-size: 18px; border-radius: 10px; border: 3px solid var(--text-color); background: transparent; color: var(--text-color); cursor: pointer; display: flex; align-items: center; gap: 8px; }
     </style>
 </head>
 <body>
@@ -113,49 +132,171 @@
     <div style="display:flex; gap:20px; align-items:center; font-size:24px;">
         <a href="/account" class="nav-link"><i class="fas fa-user"></i> Hesabım</a>
         <a href="/cart" class="nav-link"><i class="fas fa-shopping-cart"></i> Sepetim (<span id="cartCount">{{ cart_count }}</span>)</a>
-
-        <button id="themeToggle" class="theme-btn">
-            <i class="fas fa-adjust"></i> Tema
-        </button>
+        <button id="themeToggle" class="theme-btn"><i class="fas fa-adjust"></i> Tema</button>
     </div>
 </header>
 
+<div class="search-container">
+    <input type="text" id="manualSearchInput" class="search-input" placeholder="Ürün adı yazın (örn: süt)..." value="{{ search_query }}">
+    <button onclick="manualSearch()" class="search-btn"><i class="fas fa-search"></i> ARA</button>
+</div>
+
+<div class="filter-container">
+    <button class="filter-btn active" onclick="applyFilter('')" id="filterDefault">Önerilen</button>
+    <button class="filter-btn" onclick="applyFilter('en ucuz')" id="filterCheap">En Ucuz</button>
+    <button class="filter-btn" onclick="applyFilter('en iyi')" id="filterRate">En Yüksek Puan</button>
+</div>
+
 <div class="mic-container">
     <button id="micButton" class="mic-button"><i class="fas fa-microphone"></i></button>
-    <div id="status">Mikrofona basın</div>
+    <div id="status">Mikrofona basın veya yukarıdan arayın</div>
 </div>
 
 <div id="productsContainer" class="products-grid">
+    {% if welcome_mode %}
+        <div style="grid-column: 1 / -1;" class="welcome-screen">
+            <i class="fas fa-robot" style="font-size: 60px; margin-bottom: 20px; color: var(--accent-color);"></i><br>
+            Hoş geldiniz.<br>
+            <strong>"Sepetim"</strong>, <strong>"Hesabım"</strong> diyebilir<br>
+            veya aramak istediğiniz ürünü söyleyebilirsiniz.
+        </div>
+    {% else %}
+        {% for prod in products %}
+        <div class="product-card" onclick="addToCart({id:{{prod.id}}, name:'{{prod.name}}'})">
+            <div class="card-number">{{ loop.index }}</div>
+            <img src="{{ prod.image if prod.image else 'https://placehold.co/400?text=' + prod.name }}" class="product-img">
+            <div class="product-name">{{ prod.name }}</div>
+            <div class="product-price">{{ prod.price }} TL</div>
+            
+            <div class="product-rating">
+                {% set rating = prod.rating | default(0) %}
+                {% for i in range(1, 6) %}
+                    {% if i <= rating|round %} <i class="fas fa-star"></i> {% else %} <i class="far fa-star"></i> {% endif %}
+                {% endfor %}
+                <span class="rating-val">({{ rating }})</span>
+            </div>
+
+            <button class="add-cart-btn">
+                <i class="fas fa-cart-plus"></i> SEPETE EKLE
+            </button>
+        </div>
+        {% else %}
+        <div style="grid-column: 1 / -1; font-size: 24px; opacity: 0.7; margin-top: 30px;">
+            Aradığınız kriterlere uygun ürün bulunamadı.
+        </div>
+        {% endfor %}
+    {% endif %}
 </div>
+
+{% if not welcome_mode %}
+<div class="pagination">
+    {% if current_page > 1 %}
+        <a href="/market?page={{ current_page - 1 }}{{ '&q=' + search_query if search_query else '' }}" class="page-arrow"><i class="fas fa-arrow-left"></i></a>
+    {% else %}
+        <span class="page-arrow disabled"><i class="fas fa-arrow-left"></i></span>
+    {% endif %}
+    <span class="page-info">Sayfa {{ current_page }}</span>
+    {% if products|length == 6 %}
+        <a href="/market?page={{ current_page + 1 }}{{ '&q=' + search_query if search_query else '' }}" class="page-arrow"><i class="fas fa-arrow-right"></i></a>
+    {% else %}
+        <span class="page-arrow disabled"><i class="fas fa-arrow-right"></i></span>
+    {% endif %}
+</div>
+{% endif %}
 
 <script>
     const micButton = document.getElementById('micButton');
     const statusDiv = document.getElementById('status');
-    const container = document.getElementById('productsContainer');
     const overlay = document.getElementById('start-overlay');
     const cartCountSpan = document.getElementById('cartCount');
+    const searchInput = document.getElementById('manualSearchInput');
+    const filterBtns = document.querySelectorAll('.filter-btn');
 
     let isListening = false;
-    let currentState = "MAIN_MENU";
-    let currentQuery = "";
-    let currentOffset = 0;
-    let currentProducts = [];
+    let currentFilter = "";
 
-    function showMainMenuUI() {
-        // Renk kodunu kaldırdık, CSS class kullanıyoruz veya inherit ediyoruz
-        container.innerHTML = `
-            <div style="grid-column: 1 / -1; font-size: 28px; opacity: 0.8; margin-top: 50px;">
-                Ana menüdesiniz.<br><br>
-                "Ürün al", "sepete bak" veya "hesabım" diyebilirsiniz.
-            </div>
-        `;
-    }
+    // Filtre kelimeleri listesi (Temizlemek için lazım)
+    const filterKeywords = ["en ucuz", "en iyi", "en yüksek puan", "önerilen", "uygun", "yüksek puan"];
+
+    const productSpeechText = `
+        {% if welcome_mode %}
+            Hoş geldiniz. Sepetim, hesabım diyebilir veya aramak istediğiniz ürünü söyleyebilirsiniz.
+        {% elif products %}
+            İşte bulduğum ürünler: 
+            {% for prod in products %}
+                {{ loop.index }}. {{ prod.name }}, {{ prod.price | round | int }} lira. 
+            {% endfor %}
+            Seçmek için numarasını söyleyin.
+        {% else %}
+            Aradığınız ürünü bulamadım. Başka bir şey aramak ister misiniz?
+        {% endif %}
+    `;
 
     function startApp() {
         overlay.style.display = 'none';
-        currentState = "MAIN_MENU";
-        showMainMenuUI();
-        speak("Ana menüdesiniz. Ürün almak için 'ürün al', sepet için 'sepete bak', hesabım için 'hesabım' diyebilirsiniz.", true);
+        speak(productSpeechText, true);
+    }
+
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // URL'den gelen sorguyu (q) alıp filtre butonunu aktif etme
+        if (urlParams.has('q')) {
+            let q = decodeURIComponent(urlParams.get('q'));
+            if (q.includes("en ucuz")) setActiveButton('en ucuz');
+            else if (q.includes("en iyi") || q.includes("en yüksek puan")) setActiveButton('en iyi');
+            
+            // Input içindeki filtre yazılarını temizle ki kullanıcı sadece ürün adını görsün
+            // (İsteğe bağlı, ama daha temiz görünür)
+            let cleanQ = q;
+            filterKeywords.forEach(word => { cleanQ = cleanQ.replace(word, ""); });
+            searchInput.value = cleanQ.trim();
+        }
+
+        if (urlParams.has('page') || urlParams.has('q')) {
+            overlay.style.display = 'none';
+            speak(productSpeechText, true);
+        }
+    };
+
+    function setActiveButton(filterName) {
+        filterBtns.forEach(btn => btn.classList.remove('active'));
+        if (filterName === 'en ucuz') document.getElementById('filterCheap').classList.add('active');
+        else if (filterName === 'en iyi') document.getElementById('filterRate').classList.add('active');
+        else document.getElementById('filterDefault').classList.add('active');
+        currentFilter = filterName;
+    }
+
+    function applyFilter(filterName) {
+        setActiveButton(filterName);
+        manualSearch(); 
+    }
+
+    function manualSearch() {
+        // 1. Mevcut input değerini al
+        let rawQuery = searchInput.value.toLowerCase();
+        
+        // 2. Inputun içindeki ESKİ filtre kelimelerini temizle (Üst üste binmesin diye)
+        filterKeywords.forEach(word => {
+            rawQuery = rawQuery.replace(word, "");
+        });
+        
+        // 3. Fazla boşlukları temizle
+        let baseQuery = rawQuery.trim();
+
+        if(!baseQuery) {
+            speak("Lütfen önce bir ürün adı yazın.");
+            return;
+        }
+
+        // 4. Sadece ürün adı ve SEÇİLİ filtreyi birleştir
+        let finalQuery = baseQuery;
+        if (currentFilter) {
+            finalQuery += " " + currentFilter;
+        }
+
+        // 5. Yönlendir
+        window.location.href = `/market?q=${finalQuery}`;
     }
 
     function speak(text, autoListen = false) {
@@ -169,178 +310,83 @@
     function toggleMic(forceStart = false) {
         if (!forceStart && isListening) {
             isListening = false; micButton.classList.remove('listening');
-            statusDiv.textContent = "Mikrofona basın";
-            return;
+            statusDiv.textContent = "Mikrofona basın"; return;
         }
         isListening = true; micButton.classList.add('listening');
-        statusDiv.textContent = "Dinliyorum...";
-        listen();
+        statusDiv.textContent = "Dinliyorum..."; listen();
     }
 
     async function listen() {
         if (!isListening) return;
-
         try {
             const res = await fetch('/dinle', { method: 'POST' });
             const data = await res.json();
+            
+            if (data.status !== 'success') { speak("Anlaşılmadı.", true); return; }
+            if (data.action === 'redirect') {
+                speak(data.message); setTimeout(() => window.location.href = data.redirect_url, 1500); return;
+            }
 
-            if (data.status !== 'success') {
-                speak("Ses anlaşılmadı.", true);
+            const cmd = (data.command || "").toLowerCase().trim();
+            statusDiv.textContent = "Algılandı: " + cmd;
+
+            if (cmd.includes("sonraki")) {
+                const btn = document.querySelector('.page-arrow i.fa-arrow-right').parentElement;
+                if (!btn.classList.contains('disabled')) { speak("Sonraki sayfa."); setTimeout(() => btn.click(), 1000); }
+                else speak("Son sayfadasınız.");
+                return;
+            }
+            if (cmd.includes("önceki")) {
+                const btn = document.querySelector('.page-arrow i.fa-arrow-left').parentElement;
+                if (!btn.classList.contains('disabled')) { speak("Önceki sayfa."); setTimeout(() => btn.click(), 1000); }
+                else speak("İlk sayfadasınız.");
                 return;
             }
 
-            if (data.state) currentState = data.state;
-
-            if (currentState === "OPEN_CART") {
-                speak("Sepetinizi açıyorum.");
-                setTimeout(() => { window.location.href = "/cart"; }, 1500);
-                return;
+            const sayilar = {0:["bir","1"],1:["iki","2"],2:["üç","3"],3:["dört","4"],4:["beş","5"],5:["altı","6"]};
+            let sel = -1;
+            cmd.split(" ").forEach(k => { Object.entries(sayilar).forEach(([i, list]) => { if(list.includes(k)) sel=Number(i); }); });
+            if (sel !== -1) {
+                const cards = document.querySelectorAll('.product-card');
+                if (cards[sel]) { cards[sel].click(); return; }
             }
-            if (currentState === "ACCOUNT") {
-                speak("Hesabınıza gidiyorum.");
-                setTimeout(() => { window.location.href = "/account"; }, 1500);
-                return;
-            }
+            
+            if (cmd.includes("ara") || cmd.length > 2) {
+                let searchTerm = cmd.replace("ara", "").trim();
+                // Sesli komutta filtre geldiyse yakala
+                if(searchTerm.includes("en ucuz")) setActiveButton('en ucuz');
+                if(searchTerm.includes("en iyi")) setActiveButton('en iyi');
 
-            if (data.message) speak(data.message, true);
-
-            if (currentState === "LIST_PRODUCTS" && data.query) {
-                currentQuery = data.query;
-                currentOffset = 0;
-                searchProducts(currentQuery, currentOffset);
-                return;
-            }
-
-            // Command verisini backend düzeltmesinden sonra alıyoruz
-            const command = (data.command || "").toLowerCase().trim();
-            statusDiv.textContent = "Algılandı: " + command;
-
-            if (currentState === "SELECTION") {
-                if (command.includes("ana menü") || command.includes("başa dön")) {
-                    currentState = "MAIN_MENU";
-                    showMainMenuUI();
-                    speak("Ana menüdesiniz.", true);
-                    return;
-                }
-
-                if (command.includes("devam") || command.includes("sonraki") || command.includes("hiçbiri")) {
-                    currentOffset += 6;
-                    searchProducts(currentQuery, currentOffset);
-                    return;
-                }
-
-                const sayiKelimeleri = {
-                    0: ["bir", "1", "ilk", "birinci"],
-                    1: ["iki", "2", "ikinci"],
-                    2: ["üç", "3", "üçüncü"],
-                    3: ["dört", "4", "dördüncü"],
-                    4: ["beş", "5", "beşinci"],
-                    5: ["altı", "6", "altıncı"]
-                };
-
-                let selectedIndex = -1;
-                command.split(" ").forEach(k => {
-                    Object.entries(sayiKelimeleri).forEach(([i, list]) => {
-                        if (list.includes(k)) selectedIndex = Number(i);
-                    });
-                });
-
-                if (selectedIndex !== -1 && currentProducts[selectedIndex]) {
-                    addToCart(currentProducts[selectedIndex]);
-                    return;
+                if(searchTerm) {
+                    speak(searchTerm + " aranıyor."); 
+                    setTimeout(() => window.location.href = `/market?q=${searchTerm}`, 1000);
                 }
             }
 
-        } catch (e) {
-            console.error(e);
-            speak("Bir hata oluştu.", true);
-        } finally {
-            isListening = false;
-            micButton.classList.remove('listening');
-        }
-    }
-
-    async function searchProducts(query, offset) {
-        if (offset === 0) speak(query + " aranıyor...", false);
-
-        try {
-            const res = await fetch('/search_products', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ query: query, offset: offset })
-            });
-            const result = await res.json();
-
-            if (result.status === 'success') {
-                currentState = "SELECTION";
-                currentProducts = result.products;
-                displayProducts(result.products);
-            } else if (result.status === 'empty') {
-                if (offset > 0) {
-                    speak("Başka ürün yok. Baştan başlıyorum.", true);
-                    currentOffset = 0;
-                    searchProducts(query, 0);
-                } else {
-                    speak("Ürün bulunamadı. Başka bir şey söyleyin.", true);
-                    currentState = "SEARCH";
-                }
-            }
-        } catch (e) { speak("Arama hatası."); }
+        } catch (e) { speak("Hata oluştu.", true); } finally { isListening = false; micButton.classList.remove('listening'); }
     }
 
     async function addToCart(product) {
         speak(product.name + " sepete ekleniyor...");
-
-        const res = await fetch('/add_to_cart', {
-            method: "POST",
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({ product_id: product.id, quantity: 1 })
-        });
-
+        const res = await fetch('/add_to_cart', { method: "POST", headers: {'Content-Type':'application/json'}, body: JSON.stringify({ product_id: product.id }) });
         const data = await res.json();
-        if(data.status === 'success') {
-            if(data.cart_count !== undefined) {
-                cartCountSpan.innerText = data.cart_count;
-            }
-            speak("Eklendi. Başka bir ürün seçebilir veya ana menüye dönebilirsiniz.", true);
-        } else {
-            speak("Hata oluştu.", true);
-        }
-    }
-
-    function displayProducts(products) {
-        container.innerHTML = "";
-        let speechText = "İşte ürünler: ";
-
-        products.forEach((prod, index) => {
-            const card = document.createElement('div');
-            card.className = 'product-card';
-            card.innerHTML = `
-                <div class="card-number">${index + 1}</div>
-                <img src="${prod.image}" class="product-img" onerror="this.src='https://placehold.co/400?text=Resim+Yok'">
-                <div class="product-name">${prod.name}</div>
-                <div class="product-price">${prod.price} TL</div>
-            `;
-            container.appendChild(card);
-            speechText += `${index + 1}. ${prod.name}, ${Math.floor(prod.price)} lira. `;
-        });
-
-        speechText += "Hangisini ekleyelim? Numarayı söyleyin.";
-        speak(speechText, true);
+        if(data.status==='success') {
+            if(data.cart_count !== undefined) cartCountSpan.innerText = data.cart_count;
+            speak("Sepete eklendi.", true);
+        } else speak("Hata oluştu.", true);
     }
 
     micButton.addEventListener('click', () => toggleMic());
-    document.addEventListener('keydown', (e) => {
-        if (e.code === 'Space') {
-            e.preventDefault();
-            if (overlay.style.display !== 'none') startApp();
-            else toggleMic();
-        }
+    searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') manualSearch(); });
+    document.addEventListener('keydown', (e) => { 
+        if (e.code === 'Space') { 
+            if (document.activeElement === searchInput) return;
+            e.preventDefault(); 
+            if (overlay.style.display !== 'none') startApp(); 
+            else toggleMic(); 
+        } 
     });
-
 </script>
-
 <script src="{{ url_for('static', filename='theme.js') }}"></script>
-
 </body>
 </html>
