@@ -143,7 +143,10 @@
 
 <div class="filter-container">
     <button class="filter-btn active" onclick="applyFilter('')" id="filterDefault">Önerilen</button>
-    <button class="filter-btn" onclick="applyFilter('en ucuz')" id="filterCheap">En Ucuz</button>
+
+    <button class="filter-btn" onclick="applyFilter('en düşük fiyatlı')" id="filterCheap">En Düşük Fiyatlı</button>
+    <button class="filter-btn" onclick="applyFilter('en yüksek fiyatlı')" id="filterExpensive">En Yüksek Fiyatlı</button>
+
     <button class="filter-btn" onclick="applyFilter('en iyi')" id="filterRate">En Yüksek Puan</button>
 </div>
 
@@ -162,7 +165,10 @@
         </div>
     {% else %}
         {% for prod in products %}
-        <div class="product-card" onclick="addToCart({id:{{prod.id}}, name:'{{prod.name}}'})">
+    <div class="product-card"
+         onclick="addToCart(this)"
+         data-id="{{ prod.id }}"
+         data-name="{{ prod.name }}">
             <div class="card-number">{{ loop.index }}</div>
             <img src="{{ prod.image if prod.image else 'https://placehold.co/400?text=' + prod.name }}" class="product-img">
             <div class="product-name">{{ prod.name }}</div>
@@ -204,6 +210,8 @@
 </div>
 {% endif %}
 
+
+
 <script>
     const micButton = document.getElementById('micButton');
     const statusDiv = document.getElementById('status');
@@ -214,23 +222,37 @@
 
     let isListening = false;
     let currentFilter = "";
-
+    let currentOffset = 0;
+    let currentSearchQuery = ""; // Kullanıcının en son aradığı kelime (örn: "un")
     // Filtre kelimeleri listesi (Temizlemek için lazım)
-    const filterKeywords = ["en ucuz", "en iyi", "en yüksek puan", "önerilen", "uygun", "yüksek puan"];
+    const filterKeywords = [
+        "en ucuz", "en düşük fiyatlı", "uygun fiyatlı",
+        "en pahalı", "en yüksek fiyatlı", "pahalı",
+        "en iyi", "en yüksek puan", "yüksek puan", "önerilen", "uygun"
+    ];
 
     const productSpeechText = `
-        {% if welcome_mode %}
-            Hoş geldiniz. Sepetim, hesabım diyebilir veya aramak istediğiniz ürünü söyleyebilirsiniz.
-        {% elif products %}
-            İşte bulduğum ürünler: 
-            {% for prod in products %}
-                {{ loop.index }}. {{ prod.name }}, {{ prod.price | round | int }} lira. 
-            {% endfor %}
-            Seçmek için numarasını söyleyin.
-        {% else %}
-            Aradığınız ürünü bulamadım. Başka bir şey aramak ister misiniz?
-        {% endif %}
-    `;
+    {% if welcome_mode %}
+        Hoş geldiniz. Sepetim, hesabım diyebilir veya aramak istediğiniz ürünü söyleyebilirsiniz.
+    {% elif products %}
+        İşte bulduğum ürünler:
+        {% for prod in products %}
+            {{ loop.index }}.
+            {{ prod.name }},
+            {{ prod.price | round | int }} lira,
+            {% if prod.rating >= 4 %}
+                çok beğenilen, ortalama puanı {{ prod.rating }}.
+            {% elif prod.rating > 0 %}
+                ortalama puanı {{ prod.rating }}.
+            {% else %}
+                henüz puanı yok.
+            {% endif %}
+        {% endfor %}
+        Seçmek için numarasını söyleyin.
+    {% else %}
+        Aradığınız ürünü bulamadım.
+    {% endif %}
+`;
 
     function startApp() {
         overlay.style.display = 'none';
@@ -260,17 +282,29 @@
     };
 
     function setActiveButton(filterName) {
-        filterBtns.forEach(btn => btn.classList.remove('active'));
-        if (filterName === 'en ucuz') document.getElementById('filterCheap').classList.add('active');
-        else if (filterName === 'en iyi') document.getElementById('filterRate').classList.add('active');
-        else document.getElementById('filterDefault').classList.add('active');
-        currentFilter = filterName;
+        // Tüm butonlardan active sınıfını kaldır
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+
+        if (filterName.includes('en düşük') || filterName.includes('en ucuz')) {
+            document.getElementById('filterCheap').classList.add('active');
+        }
+        else if (filterName.includes('en yüksek fiyat') || filterName.includes('en pahalı')) {
+            document.getElementById('filterExpensive').classList.add('active'); // Yeni buton
+        }
+        else if (filterName.includes('en iyi') || filterName.includes('yüksek puan')) {
+            document.getElementById('filterRate').classList.add('active');
+        }
+        else {
+            document.getElementById('filterDefault').classList.add('active');
+        }
     }
 
     function applyFilter(filterName) {
+        currentFilter = filterName;
         setActiveButton(filterName);
-        manualSearch(); 
+        manualSearch();
     }
+
 
     function manualSearch() {
         // 1. Mevcut input değerini al
@@ -350,7 +384,13 @@
                 const cards = document.querySelectorAll('.product-card');
                 if (cards[sel]) { cards[sel].click(); return; }
             }
-            
+
+            const navigationWords = ["sonraki", "önceki", "devam", "hiçbiri"];
+
+            if (navigationWords.some(w => cmd.includes(w))) {
+                return; // arama bloğuna GİRME
+            }
+
             if (cmd.includes("ara") || cmd.length > 2) {
                 let searchTerm = cmd.replace("ara", "").trim();
                 // Sesli komutta filtre geldiyse yakala
@@ -366,14 +406,53 @@
         } catch (e) { speak("Hata oluştu.", true); } finally { isListening = false; micButton.classList.remove('listening'); }
     }
 
-    async function addToCart(product) {
-        speak(product.name + " sepete ekleniyor...");
-        const res = await fetch('/add_to_cart', { method: "POST", headers: {'Content-Type':'application/json'}, body: JSON.stringify({ product_id: product.id }) });
-        const data = await res.json();
-        if(data.status==='success') {
-            if(data.cart_count !== undefined) cartCountSpan.innerText = data.cart_count;
-            speak("Sepete eklendi.", true);
-        } else speak("Hata oluştu.", true);
+    // YENİ JS FONKSİYONU
+    async function addToCart(element) {
+        // Tıklanan kutunun üzerindeki verileri oku
+        const id = element.getAttribute('data-id');
+        const name = element.getAttribute('data-name');
+
+        // Sesli geri bildirim
+        speak(name + " sepete ekleniyor...");
+
+        try {
+            const res = await fetch('/add_to_cart', {
+                method: "POST",
+                headers: {'Content-Type':'application/json'},
+                // ID string olarak gelebilir, garanti olsun diye parseInt ile sayıya çeviriyoruz
+                body: JSON.stringify({ product_id: parseInt(id) })
+            });
+
+            const data = await res.json();
+
+            if(data.status === 'success') {
+                // Sepet sayısını güncelle (Sayfadaki badge)
+                if(typeof cartCountSpan !== 'undefined' && data.cart_count !== undefined) {
+                    cartCountSpan.innerText = data.cart_count;
+                }
+
+                if (data.action === 'next_page') {
+                    speak("Diğer ürünler getiriliyor.");
+                    // Mevcut offset'i 6 artırarak yeni ürünleri çek
+                    currentOffset += 6;
+                    loadProducts(currentSearchQuery, currentOffset);
+                    return; // Fonksiyondan çık
+                }
+
+                // Header'daki "Sepetim (X)" butonunu güncelle
+                const headerCartBtn = document.querySelector('.btn-account[href="/cart"]');
+                if(headerCartBtn) {
+                    headerCartBtn.innerHTML = `<i class="fas fa-shopping-cart"></i> Sepetim (${data.cart_count})`;
+                }
+
+                speak("Sepete eklendi.", true);
+            } else {
+                speak("Hata oluştu: " + (data.message || "Bilinmeyen hata"), true);
+            }
+        } catch (e) {
+            console.error(e);
+            speak("Bağlantı hatası oluştu.", true);
+        }
     }
 
     micButton.addEventListener('click', () => toggleMic());

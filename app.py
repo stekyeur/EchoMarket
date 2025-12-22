@@ -11,6 +11,33 @@ LAST_CATEGORY = None
 app = Flask(__name__)
 app.secret_key = "cok_gizli_anahtar_sabit_kalsin"
 
+# --- ORTAK TEMİZLEME FONKSİYONU (GÜNCELLENDİ) ---
+def clean_search_text(text):
+    if not text: return ""
+    text = text.lower()
+
+    # 1. Konuşma Dolgu Kelimeleri
+    filler_phrases = [
+        "satın almak istiyorum", "almak istiyorum", "istiyorum",
+        "arıyorum", "bul", "getir", "göster", "listele",
+        "bana", "satın al", "alacağım", "lazım", "var mı",
+        "bulsana", "ekle", "sipariş ver", "bak", "bakar mısın"
+    ]
+    for phrase in filler_phrases:
+        text = text.replace(phrase, "")
+
+    # 2. Filtre Kelimeleri (Pahalı filtresi eklendi)
+    filter_words = [
+        "en ucuz", "uygun fiyatlı", "uygun", "en düşük fiyatlı",
+        "en pahalı", "en yüksek fiyatlı", "pahalı",
+        "en iyi", "en yüksek puan", "yüksek puan",
+        "önerilen", "kaliteli"
+    ]
+    for f in filter_words:
+        text = text.replace(f, "")
+
+    return " ".join(text.split())
+
 # --- 1. BAĞLANTI HAVUZU (HIZ İÇİN) ---
 try:
     postgreSQL_pool = psycopg2.pool.ThreadedConnectionPool(
@@ -128,22 +155,23 @@ def register():
             close_db_connection(conn)
     return render_template('register.html')
 
-# --- MARKET (RATING + POOL + VIEW) ---
-# --- MARKET ROTASI (GÜNCELLENDİ: Başlangıçta Ürün Listelemez) ---
 @app.route('/market')
 def market():
     page = request.args.get('page', 1, type=int)
-    search_query = request.args.get('q', '')
-    
+    raw_query = request.args.get('q', '').lower()
+
     cart_count = 0
     if 'user_id' in session:
         cart_count = get_cart_count(session['user_id'])
 
-    # EĞER ARAMA SORGUSU YOKSA -> ÜRÜN GETİRME, SADECE KARŞILAMA YAP
-    if not search_query:
-        return render_template('market.html', products=[], current_page=page, search_query="", cart_count=cart_count, welcome_mode=True)
+    # Temizlik
+    clean_query = clean_search_text(raw_query)
 
-    # ARAMA VARSA -> VERİTABANINDAN ÜRÜNLERİ ÇEK
+    # Filtre Tespiti
+    is_cheapest = "en ucuz" in raw_query or "uygun" in raw_query or "en düşük fiyat" in raw_query
+    is_expensive = "en pahalı" in raw_query or "en yüksek fiyat" in raw_query # YENİ EKLENDİ
+    is_top_rated = "en iyi" in raw_query or "yüksek puan" in raw_query
+
     conn = None
     try:
         conn = get_db_connection()
@@ -151,17 +179,39 @@ def market():
         offset = (page - 1) * 6
 
         base_query = """
-            SELECT v.id, v.name, v.price, v.image_url, v.category_name, COALESCE(AVG(pr.rating), 0) as avg_rating
-            FROM view_product_summary v
-            LEFT JOIN productrating pr ON v.id = pr.productid
-        """
+                     SELECT v.id, v.name, v.price, v.image_url, v.category_name, COALESCE(AVG(pr.rating), 0) as avg_rating
+                     FROM view_product_summary v
+                              LEFT JOIN productrating pr ON v.id = pr.productid \
+                     """
         group = " GROUP BY v.id, v.name, v.price, v.image_url, v.category_name"
-        limits = f" ORDER BY v.id LIMIT 6 OFFSET {offset}"
 
-        # Arama sorgusuna göre filtrele
-        cur.execute(base_query + " WHERE v.name ILIKE %s" + group + limits, (f"%{search_query}%",))
-        
-        rows = cur.fetchall()
+        # SIRALAMA MANTIĞI (GÜNCELLENDİ)
+        if is_cheapest: order = " ORDER BY v.price ASC"
+        elif is_expensive: order = " ORDER BY v.price DESC" # YENİ: Pahalıdan ucuza
+        elif is_top_rated: order = " ORDER BY avg_rating DESC NULLS LAST"
+        else: order = " ORDER BY v.id"
+
+        limits = f" LIMIT 6 OFFSET {offset}"
+
+        rows = []
+
+        pattern = rf"\m{clean_query}\M"
+        cur.execute(
+    base_query + " WHERE v.name ~* %s" + group + order + limits,
+    (pattern,)
+)
+
+
+# 2. Kategoriyle Ara
+        if not rows and clean_query:
+            cur.execute(base_query + " WHERE v.category_name ILIKE %s" + group + order + limits, (f"%{clean_query}%",))
+            rows = cur.fetchall()
+
+        # 3. Sadece Filtre Varsa (Örn: "En pahalıları getir")
+        if not rows and not clean_query and (is_cheapest or is_top_rated or is_expensive):
+            cur.execute(base_query + group + order + limits)
+            rows = cur.fetchall()
+
         products = []
         for row in rows:
             products.append({
@@ -170,87 +220,115 @@ def market():
                 'rating': float(round(row[5], 1))
             })
 
-        return render_template('market.html', products=products, current_page=page, search_query=search_query, cart_count=cart_count, welcome_mode=False)
+        # Eğer arama yoksa ve ürün yoksa hoşgeldin modu
+        is_welcome = (not raw_query) and (not products)
+
+        return render_template('market.html', products=products, current_page=page, search_query=raw_query, cart_count=cart_count, welcome_mode=is_welcome)
     finally:
         close_db_connection(conn)
 
-# --- SEARCH (RATING + POOL + VIEW) ---
-# --- ARAMA ROTASI (GÜNCELLENDİ: En Yüksek Puan Eklendi) ---
-# --- ARAMA ROTASI (DÜZELTİLDİ: Boşluk Temizleme Eklendi) ---
 @app.route('/search_products', methods=['POST'])
 def search_products():
     data = request.get_json()
     voice_query = data.get('query', '').lower()
     offset = data.get('offset', 0)
-    
-    # 1. Filtre Kelimelerini Tespit Et
-    is_cheapest = "en ucuz" in voice_query or "uygun" in voice_query
-    is_top_rated = "en iyi" in voice_query or "yüksek puan" in voice_query or "en yüksek puan" in voice_query
 
-    # 2. Kelime Temizliği (Daha Güçlü Temizlik)
-    # Filtre kelimelerini kaldır
-    temp_query = voice_query.replace("en ucuz", "").replace("uygun", "") \
-                            .replace("en yüksek puan", "").replace("en iyi", "") \
-                            .replace("yüksek puan", "").replace("önerilen", "")
-    
-    # Arada kalan fazla boşlukları silip tek boşluğa indir (Örn: "deterjan   " -> "deterjan")
-    clean_query = " ".join(temp_query.split())
-    
+    # Filtre Tespiti
+    is_cheapest = "en ucuz" in voice_query or "uygun" in voice_query or "en düşük fiyat" in voice_query
+    is_expensive = "en pahalı" in voice_query or "en yüksek fiyat" in voice_query
+    is_top_rated = "en iyi" in voice_query or "yüksek puan" in voice_query
+
+    # Temizlik
+    clean_query = clean_search_text(voice_query)
+
     conn = None
     try:
         conn = get_db_connection()
         cur = conn.cursor()
+
         products_list = []
         found_title = None
-        
-        # Temel Sorgu
+        rows = None  # güvenli olsun diye baştan tanımlıyoruz
+
         base_sql = """
-            SELECT v.id, v.name, v.price, v.image_url, v.category_name, COALESCE(AVG(pr.rating), 0) as avg_rating
-            FROM view_product_summary v
-            LEFT JOIN productrating pr ON v.id = pr.productid
-        """
+                   SELECT v.id, v.name, v.price, v.image_url, v.category_name,
+                          COALESCE(AVG(pr.rating), 0) as avg_rating
+                   FROM view_product_summary v
+                            LEFT JOIN productrating pr ON v.id = pr.productid \
+                   """
+
         group = " GROUP BY v.id, v.name, v.price, v.image_url, v.category_name"
-        
-        # SIRALAMA MANTIĞI
+
+        # SIRALAMA
         if is_cheapest:
             order = " ORDER BY v.price ASC"
+        elif is_expensive:
+            order = " ORDER BY v.price DESC"
         elif is_top_rated:
             order = " ORDER BY avg_rating DESC NULLS LAST"
         else:
             order = " ORDER BY v.id"
-            
+
         limits = f" LIMIT 6 OFFSET {offset}"
 
-        # 1. İsim Arama (clean_query boşsa arama yapma)
+        # 1️⃣ İSİM ARAMA (REGEX + KELİME SINIRI)
         if clean_query:
-            cur.execute(base_sql + " WHERE v.name ILIKE %s" + group + order + limits, (f"%{clean_query}%",))
+            pattern = rf"\m{clean_query}\M"
+            cur.execute(
+                base_sql + " WHERE v.name ~* %s" + group + order + limits,
+                (pattern,)
+            )
             rows = cur.fetchall()
-            if rows: found_title = f"'{clean_query}' araması"
+            if rows:
+                found_title = f"'{clean_query}' araması"
 
-        # 2. İsimle bulunamadıysa Kategori Arama
-        if not products_list and not found_title:
-            target_cat = next((cat for cat, words in kategoriler.items() for w in words if w in voice_query), None)
-            if target_cat:
-                found_title = target_cat
-                cur.execute(base_sql + " WHERE v.category_name ILIKE %s" + group + order + limits, (f"%{target_cat}%",))
+        # 2️⃣ KATEGORİ ARAMA
+        if (not rows or not found_title) and clean_query:
+            cur.execute(
+                base_sql + " WHERE v.category_name ILIKE %s" + group + order + limits,
+                (f"%{clean_query}%",)
+            )
+            rows = cur.fetchall()
+            if rows:
+                found_title = f"'{clean_query}' kategorisi"
+
+        # 3️⃣ SADECE FİLTRE (Ürün adı yoksa)
+        if not rows and not clean_query:
+            if is_expensive or is_cheapest or is_top_rated:
+                cur.execute(base_sql + group + order + limits)
                 rows = cur.fetchall()
+                if is_expensive:
+                    found_title = "En yüksek fiyatlı ürünler"
+                elif is_cheapest:
+                    found_title = "En uygun fiyatlı ürünler"
+                elif is_top_rated:
+                    found_title = "En yüksek puanlı ürünler"
 
+        # SONUÇLARI DÖN
         if rows:
             for row in rows:
                 img = row[3] if row[3] else f"https://placehold.co/400?text={row[1]}"
                 products_list.append({
-                    'id': row[0], 'name': row[1], 'price': float(row[2]), 
-                    'image': img, 'category': row[4], 
+                    'id': row[0],
+                    'name': row[1],
+                    'price': float(row[2]),
+                    'image': img,
+                    'category': row[4],
                     'rating': float(round(row[5], 1))
                 })
-            
-            has_more = len(products_list) == 6
-            msg = f"{found_title} bulundu."
-            return jsonify({'status': 'success', 'products': products_list, 'message_text': msg})
-        
+
+            msg = f"{found_title} bulundu." if found_title else "Sonuçlar bulundu."
+            return jsonify({
+                'status': 'success',
+                'products': products_list,
+                'message_text': msg
+            })
+
         return jsonify({'status': 'empty', 'message': 'Ürün bulunamadı.'})
+
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)})
+
     finally:
         close_db_connection(conn)
 
@@ -466,7 +544,7 @@ def order_success(order_id):
     finally:
         close_db_connection(conn)
 
-# --- SESLİ KOMUT (DINLE) ---
+# --- SESLİ KOMUT (DINLE) - SAYFA GEÇİŞ ÖZELLİKLİ ---
 @app.route('/dinle', methods=['POST'])
 def dinle():
     global CURRENT_STATE, LAST_CATEGORY
@@ -475,40 +553,87 @@ def dinle():
     try:
         with sr.Microphone() as source:
             r.adjust_for_ambient_noise(source, duration=0.5)
-            r.energy_threshold = 400; r.dynamic_energy_threshold = False; r.pause_threshold = 0.8
-            print("🎤 Dinliyorum..."); audio = r.listen(source, timeout=5, phrase_time_limit=8)
+            r.energy_threshold = 400
+            r.dynamic_energy_threshold = False
+            r.pause_threshold = 0.8
+
+            print("🎤 Dinliyorum...");
+            audio = r.listen(source, timeout=5, phrase_time_limit=8)
             command = r.recognize_google(audio, language='tr-tr').lower()
-            
-            response = {'status': 'success', 'command': command, 'message': f"Algılanan: {command}", 'state': CURRENT_STATE}
-            
-            # GENEL KOMUTLAR
+
+            response = {
+                'status': 'success',
+                'command': command,
+                'message': f"Algılanan: {command}",
+                'state': CURRENT_STATE
+            }
+
+            # --- 1. SAYFA GEÇİŞ KOMUTLARI (YENİ EKLENDİ) ---
+            if "sonraki" in command or "diğer" in command or "hiçbiri" in command or "devam" in command:
+                response.update({
+                    "action": "next_page",
+                    "message": "Diğer ürünler getiriliyor."
+                })
+                return jsonify(response)
+
+            if command.strip() in ["hiçbiri", "devam"]:
+                 response.update({
+                     "action": "next_page",
+                     "message": "Diğer ürünler getiriliyor."
+                 })
+                 return jsonify(response)
+
+            # --- 2. GLOBAL YÖNLENDİRMELER ---
             if "çıkış" in command or "oturumu kapat" in command:
                 response.update({"action": "redirect", "redirect_url": "/logout", "message": "Çıkış yapılıyor."})
                 return jsonify(response)
 
+            if "giriş" in command:
+                response.update({"action": "redirect", "redirect_url": "/login", "message": "Giriş ekranına yönlendiriliyorsunuz."})
+                return jsonify(response)
+
+            if "kayıt" in command:
+                response.update({"action": "redirect", "redirect_url": "/register", "message": "Kayıt ekranına yönlendiriliyorsunuz."})
+                return jsonify(response)
+
+            # --- 3. DURUMA GÖRE KOMUTLAR ---
             if CURRENT_STATE == "MAIN_MENU":
-                if "sepet" in command: response.update({"state": "OPEN_CART", "action": "redirect", "redirect_url": "/cart"})
-                elif "hesabım" in command: response.update({"state": "ACCOUNT", "action": "redirect", "redirect_url": "/account"})
-                elif "market" in command: response.update({"state": "MARKET", "action": "redirect", "redirect_url": "/market"})
+                if "sepet" in command:
+                    response.update({"state": "OPEN_CART", "action": "redirect", "redirect_url": "/cart"})
+                elif "hesabım" in command:
+                    response.update({"state": "ACCOUNT", "action": "redirect", "redirect_url": "/account"})
+                elif "market" in command:
+                    response.update({"state": "MARKET", "action": "redirect", "redirect_url": "/market"})
                 elif "ürün" in command or "al" in command:
-                    CURRENT_STATE = "SEARCH"; response.update({"state": "SEARCH", "message": "Ne almak istersiniz?"})
-            
+                    CURRENT_STATE = "SEARCH"
+                    response.update({"state": "SEARCH", "message": "Ne almak istersiniz?"})
+
             elif CURRENT_STATE == "SEARCH":
                 cat = next((c for c, w in kategoriler.items() for k in w if k in command), None)
                 if cat:
-                    LAST_CATEGORY = cat; CURRENT_STATE = "CATEGORY_CONFIRM"
-                    response.update({"state": "CATEGORY_CONFIRM", "category": cat, "message": f"{cat} bulundu, listeliyim mi?"})
+                    LAST_CATEGORY = cat
+                    CURRENT_STATE = "CATEGORY_CONFIRM"
+                    response.update({"state": "CATEGORY_CONFIRM", "category": cat, "message": f"{cat} bulundu, listeleyeyim mi?"})
                 else:
                     response.update({"state": "SEARCH", "message": "Kategori anlaşılamadı, ürün aranıyor..."})
-            
+
             elif CURRENT_STATE == "CATEGORY_CONFIRM":
                 if "evet" in command or "listele" in command:
-                    CURRENT_STATE = "LIST_PRODUCTS"; response.update({"state": "LIST_PRODUCTS", "query": LAST_CATEGORY})
+                    CURRENT_STATE = "LIST_PRODUCTS"
+                    response.update({"state": "LIST_PRODUCTS", "query": LAST_CATEGORY})
                 else:
-                    CURRENT_STATE = "MAIN_MENU"; response.update({"state": "MAIN_MENU", "message": "İptal edildi."})
+                    CURRENT_STATE = "MAIN_MENU"
+                    response.update({"state": "MAIN_MENU", "message": "İptal edildi."})
 
             return jsonify(response)
-    except: return jsonify({'status': 'error', 'message': "Anlaşılamadı."})
+
+    except sr.WaitTimeoutError:
+        return jsonify({'status': 'error', 'message': "Süre doldu, ses gelmedi."})
+    except sr.UnknownValueError:
+        return jsonify({'status': 'error', 'message': "Anlaşılamadı."})
+    except Exception as e:
+        print(f"HATA: {e}")
+        return jsonify({'status': 'error', 'message': "Sistem hatası."})
 
 if __name__ == '__main__':
     app.run(debug=True)
