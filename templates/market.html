@@ -237,7 +237,7 @@
 
     const productSpeechText = `
     {% if welcome_mode %}
-        Hoş geldiniz. Sepetim, hesabım diyebilir veya aramak istediğiniz ürünü söyleyebilirsiniz.
+        Hoş geldiniz. Sepetim, hesabım diyebilir veya aramak istediğiniz ürünü söyleyebilirsiniz. İsterseniz en ucuz, en pahalı veya en yüksek puanlı ürünleri de aratabilirsiniz.
     {% elif products %}
         İşte bulduğum ürünler:
         {% for prod in products %}
@@ -274,6 +274,7 @@
         
         // URL'den gelen sorguyu (q) alıp filtre butonunu aktif etme
         if (urlParams.has('q')) {
+            currentSearchQuery = searchInput.value;
             let q = decodeURIComponent(urlParams.get('q'));
             if (q.includes("en ucuz")) setActiveButton('en ucuz');
             else if (q.includes("en iyi") || q.includes("en yüksek puan")) setActiveButton('en iyi');
@@ -379,6 +380,25 @@
 
             const cmd = (data.command || "").toLowerCase().trim();
             statusDiv.textContent = "Algılandı: " + cmd;
+            // --- SESLİ FİLTRE KOMUTLARI ---
+            if(cmd.includes("en ucuz") || cmd.includes("en düşük")){
+                speak("En ucuz ürünler gösteriliyor.");
+                window.location.href = `/market?q=${currentSearchQuery} en düşük fiyatlı`;
+                return;
+            }
+
+            if(cmd.includes("en pahalı") || cmd.includes("en yüksek fiyat")){
+                speak("En pahalı ürünler gösteriliyor.");
+                window.location.href = `/market?q=${currentSearchQuery} en yüksek fiyatlı`;
+                return;
+            }
+
+            if(cmd.includes("en iyi") || cmd.includes("en yüksek puan")){
+                speak("En yüksek puanlı ürünleri gösteriyorum.");
+                window.location.href = `/market?q=${currentSearchQuery} en iyi`;
+                return;
+            }
+
 
             if (cmd.includes("sonraki")) {
                 const btn = document.querySelector('.page-arrow i.fa-arrow-right').parentElement;
