@@ -1,2 +1,9 @@
 /.idea
+.env
 config.py
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+app_backup.py
